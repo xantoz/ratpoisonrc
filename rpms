@@ -105,6 +105,7 @@ todesktop() {
 
     rpc setenv rpms_frames_${current_desktop} "$(rpc fdump)"
     rpc setenv rpms_screen_${screen}_previous_desktop ${current_desktop}
+    rpc setenv rpms_previous_desktop ${current_desktop}
     rpc setenv rpms_screen_${screen}_current_desktop ${target}
     # rpc '%desktop-switch-invert-handler'
     rpc gselect ${target}
@@ -129,6 +130,11 @@ desktop_other() {
     # (C-t C-/) or instead of this one)
     screen=$(get_selected_screen)
     todesktop $(rpc getenv rpms_screen_${screen}_previous_desktop)
+}
+
+# Same as desktop_other, but switch to the last desktop, disregarding which screen it was on
+desktop_other_global() {
+    todesktop $(rpc getenv rpms_previous_desktop)
 }
 
 # Returns true if the desktop number is already active on some screen,
@@ -197,10 +203,11 @@ init() {
         rpc bind "F$((i + 1))" rpms_todesktop$i
     done
     rpc alias rpms_desktop-other exec "$SCRIPT_PATH desktop-other"
+    rpc alias rpms_desktop-other-global exec "$SCRIPT_PATH desktop-other-global"
     rpc alias rpms_prevdesktop exec "$SCRIPT_PATH prevdesktop"
     rpc alias rpms_nextdesktop exec "$SCRIPT_PATH nextdesktop"
     rpc bind slash rpms_desktop-other
-    rpc bind C-slash rpms_desktop-other
+    rpc bind C-slash rpms_desktop-other-global
     rpc bind less rpms_prevdesktop
     rpc bind C-less rpms_prevdesktop
     rpc bind comma rpms_prevdesktop
@@ -214,6 +221,7 @@ init() {
     screen=$(get_selected_screen)
     rpc setenv rpms_selected_screen ${screen}
     rpc setenv rpms_previous_screen ${screen}
+    rp_setenv_if_empty setenv rpms_previous_desktop 0
     for i in $(seq 0 $((numscreens - 1))); do
         # TODO: Think of a way to be intelligent here in the re-init scenario
         rp_setenv_if_empty rpms_screen_${i}_current_desktop ${i}
@@ -353,6 +361,9 @@ case "$cmd" in
         ;;
     desktop-other)
         desktop_other
+        ;;
+    desktop-other-global)
+        desktop_other_global
         ;;
     nextdesktop)
         nextdesktop
