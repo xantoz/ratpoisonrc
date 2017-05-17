@@ -1,0 +1,453 @@
+#-*- Mode: Ratpoisonrc -*-
+
+# binda cother cnext cprev os.v.
+
+# prefix map for C-t y used for many own customs stuff. Initially only used for C-t y t for watching youtubes
+newkmap waitoob
+
+definekey waitoob k exec setxkbmap -option ctrl:nocaps
+
+unmanage Qt-ponies
+unmanage qt-ponies
+unmanage bajs
+# this unmanages the trayer-srg window
+unmanage panel
+
+#alias gief-trayer exec sleep 2; pgrep -l trayer-srg || sh -c 'GTK2_RC_FILES=~/.gtkrc-2.0.alt trayer-srg --width 50 --transparent true --alpha 255 --edge top --align left'
+#exec ratpoison -c 'gief-trayer'
+
+#unmanage conky (colgate)
+#alias gief-conky exec sleep 2; pgrep -l conky || conky
+#exec ratpoison -c 'gief-conky'
+
+# setenv HOME /home/ekinant
+
+# can't use from scripts etc.
+alias curwindow exec ratpoison -c "echo `ratpoison -c 'windows' | grep '*' | egrep -o '[[:digit:]]+'`"
+
+alias reload exec ratpoison -c "source $HOME/.config/ratpoison/ratpoisonrc"
+alias loadrc reload
+
+set bgcolor black
+set fgcolor green
+set infofmt (%H, %W) %n(%c - %a) -- PID: %p, XWID: %i
+
+set fwcolor white
+
+# set font DroidSansFallback-11
+# set font KochiGothic
+# set font KochiMincho
+# set font IpaMonaMincho
+# set font IpaMonaGothic
+set font unifont
+
+bind apostrophe select
+
+bind o focus
+bind C-o focusprev
+
+bind Tab focuslast
+
+# # frame slots
+alias store-fs1   exec ratpoison -c "setenv fs1 `ratpoison -c 'fdump'`"
+alias restore-fs1 exec ratpoison -c "frestore `ratpoison -c 'getenv fs1'`"
+alias store-fs2   exec ratpoison -c "setenv fs2 `ratpoison -c 'fdump'`"
+alias restore-fs2 exec ratpoison -c "frestore `ratpoison -c 'getenv fs2'`"
+alias store-fs3   exec ratpoison -c "setenv fs3 `ratpoison -c 'fdump'`"
+alias restore-fs3 exec ratpoison -c "frestore `ratpoison -c 'getenv fs3'`"
+alias store-fs4   exec ratpoison -c "setenv fs4 `ratpoison -c 'fdump'`"
+alias restore-fs4 exec ratpoison -c "frestore `ratpoison -c 'getenv fs4'`"
+alias store-fs5   exec ratpoison -c "setenv fs5 `ratpoison -c 'fdump'`"
+alias restore-fs5 exec ratpoison -c "frestore `ratpoison -c 'getenv fs5'`"
+
+bind M-exclam store-fs1
+bind M-1 restore-fs1
+bind M-at store-fs2
+bind M-2 restore-fs2
+bind M-numbersign store-fs3
+bind M-3 restore-fs3
+bind M-dollar store-fs4
+bind M-4 restore-fs4
+bind M-percent store-fs5
+bind M-5 restore-fs5
+
+
+# more splitting options
+bind C-s split 2/3
+bind C-S hsplit 2/3
+
+# avoid stretching for the arrow keys (prefixless binds)
+# TODO: I should probably use these more...
+definekey top s-o focus
+definekey top s-O focusprev
+definekey top s-j focusleft
+definekey top s-k focusdown
+definekey top s-i focusup
+definekey top s-l focusright
+definekey top C-s-j exchangeleft
+definekey top C-s-k exchangedown
+definekey top C-s-i exchangeup
+definekey top C-s-l exchangeright
+definekey top s-Left focusleft
+definekey top s-Down focusdown
+definekey top s-Up focusup
+definekey top s-Right focusright
+definekey top C-s-Left exchangeleft
+definekey top C-s-Down exchangedown
+definekey top C-s-Up exchangeup
+definekey top C-s-Right exchangeright
+# newkmap focus
+# definekey focus j focusleft
+# definekey focus k focusdown
+# definekey focus i focusup
+# definekey focus l focusright
+# definekey focus C-j exchangeleft
+# definekey focus C-k exchangedown
+# definekey focus C-i exchangeup
+# definekey focus C-l exchangeright
+# definekey top XF86Launch1 readkey focus
+
+setenv filewin_w 1000
+setenv filewin_h 700
+alias fix-gtk-filechooser exec sed -i -e 's/GeometryWidth=.*$/GeometryWidth='"${filewin_w}/" -e 's/GeometryHeight=.*$/GeometryHeight='"${filewin_h}/" ~/.config/gtk-2.0/gtkfilechooser.ini; gsettings set org.gtk.Settings.FileChooser window-size "(${filewin_w}, ${filewin_h})"
+alias fix-audacious-filebrowser exec sed -i -e 's/filebrowser_win=.*$/filebrowser_win=100,100,'"${filewin_w},${filewin_h}/" ~/.config/audacious/config
+definekey waitoob g exec ratpoison -c fix-gtk-filechooser -c fix-audacious-filebrowser
+
+
+alias transset-toggle exec transset
+alias transset exec transset $(ratpoison -c 'prompt trans: ')
+definekey waitoob o transset-toggle
+definekey waitoob C-o transset-toggle
+definekey waitoob O transset
+definekey waitoob C-O transset
+definekey waitoob q gief-trayer
+
+# setenv xterm-trans .75
+setenv xterm_trans .85
+
+alias xterm-count exec ratpoison -c "echo XTerm count: $(ratpoison -c 'windows %c' | grep XTerm | wc -l)"
+
+# bind C-exclam colon exec urxvtc -e
+alias system exec ratpoison -c "echo $(sh -c "$(ratpoison -c 'prompt system: ')")"
+#alias st exec st 
+bind C-exclam system
+bind C-M-exclam colon exec xterm -e
+bind c exec st
+
+# bind c exec urxvtc
+# alias xterm exec xterm -e 'sh -c "export TERM=xterm-256color; transset -i $WINDOWID .75; exec rlfe bash"'
+# alias xterm-white exec xterm +rv -e 'sh -c "export TERM=xterm-256color; transset -i $WINDOWID .90; exec rlfe bash"'
+# alias urxvtc-transparent exec urxvtc +tr -e sh -c 'transset -i $WINDOWID .75; exec rlfe bash'
+# alias xterm exec xterm -e 'sh -c "export TERM=xterm-256color; transset -i $WINDOWID .75; exec bash -l"'
+# alias xterm-white exec xterm +rv -e 'sh -c "export TERM=xterm-256color; transset -i $WINDOWID .90; exec bash -l"'
+# alias xterm exec xterm -e 'sh -c "transset -i $WINDOWID $xterm_trans; exec bash -l"'
+
+# alias xterm exec xterm -e 'sh -c "transset -i $WINDOWID $xterm_trans; exec bash -l"'
+alias xterm exec xterm -e 'sh -c "transset -i $WINDOWID $xterm_trans; exec bash"'
+
+# alias xterm-white exec xterm -rv -e 'sh -c "transset -i $WINDOWID .90; exec bash -l"'
+alias xterm-white exec xterm -rv -e 'sh -c "transset -i $WINDOWID .90; exec bash"'
+# alias urxvtc-transparent exec urxvtc +tr -e sh -c 'transset -i $WINDOWID .75; exec bash -l'
+# bind C-c xterm
+bind C-c exec ratpoison -c 'xterm'; sleep .1; ratpoison -c 'xterm-count'
+bind C-C xterm-white
+# bind C-M-c urxvtc-transparent
+# definekey top XF86Launch1 xterm
+
+# easystroke toggle stuff
+alias easystroke-toggle exec if pgrep -l easystroke; then killall easystroke; ratpoison -c 'echo Gestures disabled'; else ratpoison -c 'echo Gestures enabled'; exec easystroke; fi
+# definekey top XF86MyComputer easystroke-toggle
+
+newkmap smallbutton
+definekey top XF86MyComputer readkey smallbutton
+definekey smallbutton XF86MyComputer easystroke-toggle
+definekey smallbutton XF86TouchpadToggle exec ratpoison -c 'meta o' -c 'meta o'
+definekey smallbutton XF86ScreenSaver meta space
+definekey smallbutton Up meta s
+definekey smallbutton Down meta v
+definekey smallbutton Right meta j
+
+# definekey waitoob g easystroke-toggle
+
+
+# Rotatey stuff
+setenv rotation 0
+# setenv old 
+setenv old -old
+
+# rotate-handle-xsetwacom never called directly! (maybe use getenv, instead of tjosan, in future if buggy?)
+alias %rotate-handle-xsetwacom exec FISK=$(if [ "$rotation" -eq 0 ]; then echo -n 0; elif [ "$rotation" -eq 1 ]; then echo -n 2; elif [ "$rotation" -eq 2 ]; then echo -n 3; elif [ "$rotation" -eq 3 ]; then echo -n 1; else echo "BAJSSJSJSJSJSJSJSJ"; fi); for i in cursor stylus eraser; do xsetwacom --set $i rotate $FISK; done
+alias %rotate-handle-xrandr exec xrandr --output LVDS1 --rotate $(if [ "$rotation" -eq 0 ]; then echo -n normal; elif [ "$rotation" -eq 1 ]; then echo -n left; elif [ "$rotation" -eq 2 ]; then echo -n inverted; elif [ "$rotation" -eq 3 ]; then echo -n right; else echo "BAJSSJSJSJSJSJSJSJ"; fi)
+alias %rotate-handle-xrandr-old exec xrandr -o $rotation
+alias rotate-counterclockwise exec newrot=$(( rotation + 1 )); [ "$newrot" -gt 3 ] && newrot=0; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
+alias rotate-clockwise        exec newrot=$(( rotation - 1 )); [ "$newrot" -lt 0 ] && newrot=3; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
+alias rotate-toggle-tablet-mode exec [ "$rotation" -eq 3 ] && newrot=0 || newrot=3; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
+alias rotate-0 exec newrot=$(( rotation ^ 1 )); ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
+alias rotate-1 exec newrot=$(( rotation ^ 2 )); ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
+alias rotate-2 exec ratpoison -c rotate-0 -c rotate-1
+
+definekey top C-XF86ScreenSaver rotate-clockwise
+definekey top C-M-XF86ScreenSaver rotate-counterclockwise
+definekey top C-XF86TouchpadToggle rotate-toggle-tablet-mode
+definekey top XF86ScreenSaver rotate-1
+definekey top XF86TouchpadToggle rotate-0
+
+
+
+# Volumey stuff. Unmute used only indirectly.
+# setenv volume_step 3
+setenv volume_step 2
+setenv volume_card 0
+alias %volume-unmute exec amixer -c $volume_card sset Master on; ratpoison -c 'echo Unmuted'
+alias volume-up     exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}+ | grep -o '\[.*dB\]'`"; fi
+alias volume-down   exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}- | grep -o '\[.*dB\]'`"; fi
+alias volume-mute   exec amixer -c $volume_card sset Master off; ratpoison -c 'echo Muted'
+definekey top XF86AudioMute volume-mute
+definekey top XF86AudioLowerVolume volume-down
+definekey top XF86AudioRaiseVolume volume-up
+
+# Sleepy stuff
+# definekey top XF86Sleep exec /usr/local/bin/soemn
+# definekey top XF86Suspend exec /usr/local/bin/dvala
+# definekey top XF86Battery exec /usr/local/bin/laas
+
+
+# bind e exec emacsclient -c -e '(progn (toggle-night-mode) (set-frame-font-size 10))'
+bind e exec emacsclient -c 
+
+
+bind C-n inext
+bind C-N cnext
+bind C-p iprev
+bind C-P cprev
+bind C-t other
+bind C-T iother
+bind C-M-T cother
+bind C-M-t cother
+
+alias xclock-toggle exec ratpoison -c 'unmanage xclock'; (pgrep -f xclock && killall xclock) || LC_ALL=ja_JP.utf8 xclock -digital -update 1 &
+bind C-x xclock-toggle
+
+alias lock-screen exec if uname --kernel-version | grep -qi ubuntu; then gnome-screensaver-command -a; else xtrlock; fi
+
+bind y readkey waitoob
+bind C-y readkey waitoob
+definekey waitoob t exec /usr/local/bin/yt.sh
+definekey waitoob T exec mpv `xsel -o`
+
+
+alias describe-key describekey root
+alias where-is exec ratpoison -c "echo $(ratpoison -c 'help' | grep $(ratpoison -c 'prompt Where is command: ') | xargs -i echo C-t {})" || ratpoison -c 'echo No match'
+newkmap help
+bind h readkey help
+bind C-h readkey help
+definekey help c describe-key
+definekey help k describekey
+definekey help w where-is
+
+
+alias calc exec ratpoison -c "echo $(calc "$(ratpoison -c 'prompt calc: ')")"
+bind plus calc
+bind equal calc
+
+alias man colon exec xterm -e man 
+# alias man exec xterm -e "man $(ratpoison -c 'prompt man: ')"
+bind at man
+bind C-at man
+
+
+alias pgrep-l exec ratpoison -c "echo $(pgrep -l $(ratpoison -c 'prompt pgrep -l '))" || ratpoison -c 'echo No results'
+alias pgrep-af exec ratpoison -c "echo $(pgrep -af $(ratpoison -c 'prompt pgrep -af '))" || ratpoison -c 'echo No results'
+bind M-p pgrep-l
+bind M-P pgrep-af
+# bind C-P pgrep-l
+# bind C-M-P pgrep-af
+
+alias volume exec ratpoison -c "echo $(volume=$(amixer -c 5 | grep 'Mono: Playback' | grep -o '[[:digit:]]*' | head -1); echo -n ${volume}\\14\ $(amixer -c 5 | grep -Eo '\[(on|off)\]')\ ; echo -n '['; for i in $(seq 1 $volume); do echo -n '%'; done; for i in $(seq 1 $(( 14 - $volume ))); do echo -n '-'; done; echo -n ']')"
+bind v volume
+
+# bind Escape exec conkeror -batch -f unfocus
+# bind C-Escape exec conkeror -batch -f unfocus; conkeror -batch -f unfocus
+# definekey top Escape exec if ratpoison -c 'windows' | grep -E '[[:digit:]]+\*.*Conkeror'; then conkeror -f unfocus; else ratpoison -c 'meta Escape'; fi
+# definekey top Escape exec if ratpoison -c 'info' | grep '.*Conkeror)$'; then conkeror -batch -f unfocus; else ratpoison -c 'meta Escape'; fi
+
+
+alias uptime exec ratpoison -c "echo $(/usr/bin/uptime)"
+alias ddate exec ratpoison -c "echo $(ddate)"
+# alias battery exec ratpoison -c "echo $(cat /proc/acpi/battery/BAT0/state)"
+alias battery exec ratpoison -c "echo $(emacsclient -e \(battery\))"
+alias battery-verbose exec ratpoison -c "echo $(cat /proc/acpi/battery/BAT0/state; echo; emacsclient -e \(battery\))"
+alias ifconfig exec ratpoison -c "echo $(which ifconfig > /dev/null && ifconfig || /sbin/ifconfig)"
+alias iwconfig exec ratpoison -c "echo $(/sbin/iwconfig)"
+# alias sensors exec ratpoison -c "echo $(sensors; echo; echo FAN; egrep 'level:|speed:' /proc/acpi/ibm/fan)"
+alias sensors exec ratpoison -c "echo $(sensors; echo; echo FAN; egrep 'level:|speed:' /proc/acpi/ibm/fan | sed 's/\t/    /g')"
+# alias cpufreq-info exec ratpoison -c "echo `cpufreq-info`"
+alias cpufreq-info exec ratpoison -c "echo `cpupower frequency-info`"
+
+bind C-b battery
+bind C-M-b battery-verbose
+bind C-i ifconfig
+bind C-I iwconfig
+# bind V invert-colors
+bind C-a uptime
+bind C-A ddate
+bind C-B sensors
+bind B cpufreq-info
+
+definekey top Print exec scrot
+bind Print exec scrot
+bind C-Print exec scrot -s
+
+# alias windows_dmenu exec ratpoison -c "select $(ratpoison -c 'windows' | dmenu -i -l 123 | grep -o '^[[:digit:]]*')"
+# bind W windows_dmenu
+
+# alias windows_dmenu_global exec (for i in $(seq 0 $((desktop_count - 1))); do ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"; done) | grep -v 'No managed windows' | dmenu -i -l 123 | perl -ne '/\((\d+)\)\s+(\d+)/; print "ratpoison -c gselect\\ $1 -c select\\ $2\n"' | sh; ratpoison -c "gselect $current_desktop"
+# bind C-W windows_dmenu_global
+
+# alias windows_dmenu_global exec (for i in $(seq 0 $((rpms_desktop_count - 1))); do ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"; done) | grep -v 'No managed windows' | dmenu -i -l 123 | perl -ne '/\((\d+)\)\s+(\d+)/; print "ratpoison -c gselect\\ $1 -c select\\ $2\n"' | sh; ratpoison -c "gselect $current_desktop"
+# bind C-W windows_dmenu_global
+
+
+alias xpdf exec xpdf -cont -remote fisk
+alias xpdf_toggle_cont exec xpdf -remote fisk -exec toggleContinuousMode
+alias xpdf_toggle_fs exec xpdf -remote fisk -exec toggleFullScreenMode
+alias xpdf_open exec xpdf -remote fisk -exec openFile\($(ratpoison -c prompt)\)
+alias xpdf_open_nw exec xpdf -remote fisk -exec openFileInNewWin\($(ratpoison -c prompt)\)
+alias xpdf_open_dlg exec xpdf -remote fisk -exec open
+alias xpdf_open_nw_dlg exec xpdf -remote fisk -exec openInNewWin
+alias xpdf_zoom exec xpdf -remote fisk -exec zoomPercent\($(ratpoison -c prompt)\) 
+alias xpdf_menu exec ratpoison -c 'ratwarp 500 100'; ratpoison -c 'ratclick 3'; ratpoison -c 'ratrelwarp 10 10'; sleep 0.1; ratpoison -c 'meta Down'
+# alias xpdf_menu exec ratpoison -c 'ratwarp 500 100'; ratpoison -c 'ratclick 3'; ratpoison -c 'ratrelwarp 10 10'; ratpoison -c 'banish'
+# alias xpdf_menu exec ratpoison -c 'ratwarp 500 100'; ratpoison -c 'ratclick 3'; sleep 0.2; ratpoison -c 'ratrelwarp 10 10'; sleep 0.2; ratpoison -c 'banish'
+
+# acpi uses this? oh yeah
+setenv blammo_counter 0
+alias blammo exec ratpoison -c "echo Blammo! $blammo_counter" -c "setenv blammo_counter $(( $blammo_counter + 1 ))" 
+
+# Moving with mouse madness
+setenv mouse_step 10
+setenv mouse_step_diag 7
+setenv mouse_hold_1 f
+setenv mouse_hold_2 f
+setenv mouse_hold_3 f
+alias mouse-set-step exec ratpoison -c "setenv mouse_step $(ratpoison -c 'prompt')"; ratpoison -c "setenv mouse_step_diag $(calc round\($(ratpoison -c 'getenv step')/sqrt\(2\)\) | grep -o '[[:digit:]]*')"
+alias mouse-up exec ratpoison -c "ratrelwarp 0 -$mouse_step"
+alias mouse-down exec ratpoison -c "ratrelwarp 0 $mouse_step"
+alias mouse-left exec ratpoison -c "ratrelwarp -$mouse_step 0"
+alias mouse-right exec ratpoison -c "ratrelwarp $mouse_step 0"
+alias mouse-up-left exec ratpoison -c "ratrelwarp -$mouse_step_diag -$mouse_step_diag"
+alias mouse-up-right exec ratpoison -c "ratrelwarp $mouse_step_diag -$mouse_step_diag"
+alias mouse-down-left exec ratpoison -c "ratrelwarp -$mouse_step_diag $mouse_step_diag"
+alias mouse-down-right exec ratpoison -c "ratrelwarp $mouse_step_diag $mouse_step_diag"
+alias mouse-toggle-1 exec if [ $mouse_hold_1 = 'f' ]; then ratpoison -c 'rathold down 1' -c 'setenv mouse_hold_1 t'; else ratpoison -c 'rathold up 1' -c 'setenv mouse_hold_1 f'; fi
+alias mouse-toggle-2 exec if [ $mouse_hold_2 = 'f' ]; then ratpoison -c 'rathold down 2' -c 'setenv mouse_hold_2 t'; else ratpoison -c 'rathold up 2' -c 'setenv mouse_hold_2 f'; fi
+alias mouse-toggle-3 exec if [ $mouse_hold_3 = 'f' ]; then ratpoison -c 'rathold down 3' -c 'setenv mouse_hold_3 t'; else ratpoison -c 'rathold up 3' -c 'setenv mouse_hold_3 f'; fi
+alias mouse-click-1 exec ratpoison -c 'ratclick 1' -c 'setenv mouse_hold_1 f'
+alias mouse-click-2 exec ratpoison -c 'ratclick 2' -c 'setenv mouse_hold_2 f'
+alias mouse-click-3 exec ratpoison -c 'ratclick 3' -c 'setenv mouse_hold_3 f'
+
+alias mouse-unhold exec [ $mouse_hold_1 = 't' ] && ratpoison -c 'mouse-toggle-1'; [ $mouse_hold_2 = 't' ] && ratpoison -c 'mouse-toggle-2'; [ $mouse_hold_3 = 't' ] && ratpoison -c 'mouse-toggle-3'; ratpoison -c 'echo Phew!'
+
+# alias mouse-start exec ratpoison -c 'setenv mousing true'; while [ $(ratpoison -c 'getenv mousing') = 'true' ]; do ratpoison -c 'readkey mouse'; done
+# alias mouse-stop setenv mousing false
+alias mouse-start exec ratpoison -c 'set topkmap mouse' -c 'echo Mousey!'
+alias mouse-stop exec ratpoison -c 'mouse-unhold' -c 'set topkmap top' 
+
+newkmap mouse
+definekey mouse h mouse-left
+definekey mouse l mouse-right
+definekey mouse j mouse-down
+definekey mouse k mouse-up
+definekey mouse q mouse-stop
+definekey mouse C-g mouse-stop
+definekey mouse Escape mouse-stop
+definekey mouse y mouse-up-left
+definekey mouse u mouse-up-right
+definekey mouse b mouse-down-left
+definekey mouse n mouse-down-right
+definekey mouse space mouse-click-1
+definekey mouse period mouse-click-2
+definekey mouse comma mouse-click-3
+definekey mouse C-space mouse-toggle-1
+definekey mouse C-period mouse-toggle-2
+definekey mouse C-comma mouse-toggle-3
+definekey mouse M-space mouse-toggle-1
+definekey mouse M-period mouse-toggle-2
+definekey mouse Mst-comma mouse-toggle-3
+
+bind m mouse-start
+
+# bind Escape abort
+
+# alias amiwm exec killall xcompmgr; ratpoison -c 'tmpwm amiwm'; xcompmgr
+
+# Magicness
+grename 0
+alias current-desktop exec ratpoison -c "echo Desktop $current_desktop ($previous_desktop)"
+bind d current-desktop
+bind C-d current-desktop
+
+newkmap gee
+definekey gee m gmove
+definekey gee s gselect
+definekey gee g groups
+definekey gee d gselect-current-desktop
+definekey gee c gselect-current-desktop
+definekey gee n gnext
+definekey gee p gprev
+definekey gee h gmove-here
+bind g readkey gee
+
+## per workspace registers
+alias r1-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r1 `ratpoison -c fdump`"
+alias r2-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r2 `ratpoison -c fdump`"
+alias r3-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r3 `ratpoison -c fdump`"
+alias r4-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r4 `ratpoison -c fdump`"
+alias r1-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r1)"
+alias r2-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r2)"
+alias r3-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r3)"
+alias r4-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r4)"
+newkmap register
+newkmap register-store
+newkmap register-fetch
+definekey register s readkey register-store
+definekey register f readkey register-fetch
+definekey register-store 1 r1-store
+definekey register-store 2 r2-store
+definekey register-store 3 r3-store
+definekey register-store 4 r4-store
+definekey register-fetch 1 r1-fetch
+definekey register-fetch 2 r2-fetch
+definekey register-fetch 3 r3-fetch
+definekey register-fetch 4 r4-fetch
+
+definekey waitoob r readkey register
+# dessa kan tas bort i framtiden vid behov av plats?
+definekey waitoob f readkey register-fetch
+definekey waitoob s readkey register-store
+
+# being able to toggle borders is a good thing. for things like
+# mplayer borders are a nuisance but for many tiled terminals it
+# becomes easier to remember the current one
+alias toggle-borders exec if [ "$(ratpoison -c 'set border')" -ge 1 ]; then ratpoison -c 'set border 0'; else ratpoison -c 'set border 1'; fi
+definekey waitoob b toggle-borders
+
+alias toggle-xcompmgr exec if pgrep xcompmgr; then killall xcompmgr; else xcompmgr & fi; true
+alias toggle-compton exec if pgrep compton; then killall compton; else compton --glx-no-stencil --backend glx --opengl --paint-on-overlay --vsync opengl-swc & fi; true
+definekey waitoob x toggle-compton
+
+setenv latitude 59.32944
+setenv longitude 18.06861
+alias toggle-redshift exec killall -USR1 redshift
+definekey waitoob z toggle-redshift
+
+# movie mode
+definekey waitoob m exec ratpoison -c 'toggle-borders' -c 'toggle-xcompmgr'
+
+exec $HOME/.config/ratpoison/rpms init 12
+
+exec wmname LG3D
+
+
+echo And it burns burns burns...
+

@@ -1,0 +1,393 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_PATH="$(realpath $0)"
+
+rpc() {
+    ratpoison -c "$*"
+}
+
+rp_setenv_if_empty() {
+    if [ $# -lt 2 ]; then
+        echo_err "Too few arguments"
+        return 1
+    fi
+    varname="$1"
+    val="$2"
+    if [ -z "${varname}" ]; then
+        echo_err "Empty varname"
+        return 2
+    fi
+    oldval="$(rpc getenv ${varname} || true)"
+    if [ -z "${oldval}" ]; then
+        rpc setenv "${varname}" "${val}"
+    fi
+}
+
+die() {
+    echo "$@"
+    exit 1
+}
+
+echo_err() {
+    >&2 echo "$@"
+}
+
+error() {
+    msg="ERROR: $*"
+    echo_err "${msg}"
+    rpc echo "${msg}"
+}
+
+get_selected_screen() {
+    screen_number=-1
+    OIFS=$IFS
+    IFS=","
+    for dump in $(rpc sdump); do
+        # last column indicates active screen, second column screen number
+        active="$(echo "$dump" | awk '{print $NF}')"
+        if [ $active -eq 1 ]; then
+            screen_number="$(echo "$dump" | awk '{print $2}')"
+            break
+        fi
+    done
+    IFS=$OIFS
+    echo $screen_number
+}
+
+get_current_desktop() {
+    screen=${1:-$(get_selected_screen)}
+    rpc getenv rpms_screen_${screen}_current_desktop
+}
+
+get_previous_desktop() {
+    screen=${1:-$(get_selected_screen)}
+    rpc getenv rpms_screen_${screen}_previous_desktop
+}
+
+get_numscreens() {
+    rpc getenv rpms_numscreens
+}
+
+switchscreen_hook() {
+    # Guarantee that we always have the right group selected for the new screen
+    screen=$(get_selected_screen)
+    rpc gselect $(rpc getenv rpms_screen_${screen}_current_desktop)
+    rpc setenv rpms_previous_screen $(rpc getenv rpms_selected_screen)
+    rpc setenv rpms_selected_screen ${screen}
+}
+
+desktop_out_of_range() {
+    desktop="$1"
+    ! ([ ${desktop} -ge 0 ] && [ ${desktop} -lt $(rpc getenv rpms_desktop_count) ])
+}
+
+todesktop() {
+    target=$1
+    if desktop_out_of_range ${target}; then
+        error "Desktop ${target} out of range"
+        return 1
+    fi
+
+    screen=$(get_selected_screen)
+    current_desktop=$(rpc getenv rpms_screen_${screen}_current_desktop)
+
+    # Check if our target desktop already is displayed on another screen
+    numscreens=$(get_numscreens)
+    for i in $(seq 0 $((numscreens - 1))); do
+        if [ $(rpc getenv rpms_screen_${i}_current_desktop) -eq ${target} ]; then
+            # TODO: variant (extra parameter?) that causes the screen to swap with each other herbstluftwm style?
+            rpc echo "[SWITCH] Desktop ${target} on screen ${i}"
+            rpc sselect $i
+            return 0
+        fi
+    done
+
+    rpc setenv rpms_frames_${current_desktop} "$(rpc fdump)"
+    rpc setenv rpms_screen_${screen}_previous_desktop ${current_desktop}
+    rpc setenv rpms_screen_${screen}_current_desktop ${target}
+    # rpc '%desktop-switch-invert-handler'
+    rpc gselect ${target}
+    frames="$(rpc getenv rpms_frames_${target})"
+    if [ -z "${frames}" ] || [ "${frames}" = "undef" ]; then
+        # No frames saved for this desktop yet, present emptyness
+        rpc only
+        rpc select -
+    else
+        rpc frestore "${frames}"
+    fi
+    rpc echo "Desktop ${target}"
+}
+
+desktop_other() {
+    # TODO: is the todesktop default decent behaviour when our current
+    # screen previous desktop is visible on another screen?
+    # Problem: switching to another screen with other feels intuitive,
+    # but next time calling desktop-other we will be on another
+    # screen, and thus also another previous desktop variable.
+    # (Possible fix: Have global previous desktop variable in addition
+    # (C-t C-/) or instead of this one)
+    screen=$(get_selected_screen)
+    todesktop $(rpc getenv rpms_screen_${screen}_previous_desktop)
+}
+
+# Returns true if the desktop number is already active on some screen,
+# or if the desktop number is out of range
+desktop_used() {
+    desktop="$1"
+    if desktop_out_of_range ${desktop}; then
+        return 0
+    fi
+    numscreens=$(get_numscreens)
+    for i in $(seq 0 $((numscreens - 1))); do
+        [ $(rpc getenv rpms_screen_${i}_current_desktop) -eq ${desktop} ] && return 0
+    done
+    return 1
+}
+
+get_prev_desktop() {
+    # a negative value means unable to find desktop
+    desktop="$(( $(get_current_desktop) - 1 ))"
+    while desktop_used $desktop; do
+        desktop=$((desktop - 1))
+    done
+    echo ${desktop}
+}
+
+get_next_desktop() {
+    # a value >= rpms_desktop_count means unable to find desktop
+    desktop="$(( $(get_current_desktop) + 1 ))"
+    while desktop_used $desktop; do
+        desktop=$((desktop + 1))
+    done
+    echo ${desktop}
+}
+
+prevdesktop() {
+    target=$(get_prev_desktop)
+    if [ ${target} -ge 0 ]; then
+        todesktop ${target}
+    fi
+}
+
+nextdesktop() {
+    target=$(get_next_desktop)
+    if [ ${target} -lt $(rpc getenv rpms_desktop_count) ]; then
+        todesktop ${target}
+    fi
+}
+
+# TODO: command that lets us swap workspace left/right between screens
+# TODO: command that lets us move workspace to screen number
+# TODO: screen-other command ?
+
+init() {
+    numscreens=$(( $(rpc sdump | (grep -so ',' || true) | wc -l) + 1 )) # number of commas in sdump + 1
+    desktop_count=${1:-12}
+    [ ${desktop_count} -gt ${numscreens} ] || \
+        die "Must have more virtual desktops than there are screens"
+
+    rpc setenv rpms_desktop_count ${desktop_count}
+    for i in $(seq 1 $((desktop_count - 1))); do
+        rpc gnewbg $i || true
+    done
+    for i in $(seq 0 $((desktop_count - 1))); do
+        rp_setenv_if_empty rpms_frames_$i undef
+        rpc alias rpms_todesktop$i exec "$SCRIPT_PATH todesktop $i"
+        rpc bind "F$((i + 1))" rpms_todesktop$i
+    done
+    rpc alias rpms_desktop-other exec "$SCRIPT_PATH desktop-other"
+    rpc alias rpms_prevdesktop exec "$SCRIPT_PATH prevdesktop"
+    rpc alias rpms_nextdesktop exec "$SCRIPT_PATH nextdesktop"
+    rpc bind slash rpms_desktop-other
+    rpc bind C-slash rpms_desktop-other
+    rpc bind less rpms_prevdesktop
+    rpc bind C-less rpms_prevdesktop
+    rpc bind comma rpms_prevdesktop
+    rpc bind C-comma rpms_prevdesktop
+    rpc bind greater rpms_nextdesktop
+    rpc bind C-greater rpms_nextdesktop
+    rpc bind period rpms_nextdesktop
+    rpc bind C-period rpms_nextdesktop
+
+    rpc setenv rpms_numscreens ${numscreens}
+    screen=$(get_selected_screen)
+    rpc setenv rpms_selected_screen ${screen}
+    rpc setenv rpms_previous_screen ${screen}
+    for i in $(seq 0 $((numscreens - 1))); do
+        # TODO: Think of a way to be intelligent here in the re-init scenario
+        rp_setenv_if_empty rpms_screen_${i}_current_desktop ${i}
+        rp_setenv_if_empty rpms_screen_${i}_previous_desktop ${i}
+        # rpc setenv rpms_screen_${i}_current_desktop ${i}
+        # rpc setenv rpms_screen_${i}_previous_desktop ${i}
+    done
+    # These two are basic ratpoison commands, and not aliases defined
+    # by rpms, but lets give them nicer keybinds
+    rpc bind bracketleft prevscreen
+    rpc bind bracketright nextscreen
+
+    rpc alias rpms_switchscreen-hook exec "$SCRIPT_PATH switchscreen-hook"
+    rpc addhook switchscreen rpms_switchscreen-hook
+
+    rpc alias rpms_current-desktop exec "$SCRIPT_PATH current-desktop"
+    rpc alias rpms_identify-screens exec "$SCRIPT_PATH identify-screens"
+    rpc bind d rpms_current-desktop
+    rpc bind C-d rpms_identify-screens
+
+    rpc alias gmove-here exec "$SCRIPT_PATH gmove-here"
+    rpc alias gselect-current-desktop exec "$SCRIPT_PATH gselect-current-desktop"
+    rpc alias windows-all exec $SCRIPT_PATH all-windows
+    rpc bind C-w windows-all
+
+    rpc alias windows-dmenu exec "$SCRIPT_PATH windows-dmenu"
+    rpc alias windows-dmenu-global exec "$SCRIPT_PATH windows-dmenu-global"
+    rpc bind W windows-dmenu
+    rpc bind C-W windows-dmenu-global
+    rpc bind M-w windows-dmenu-global
+    # rpc bind C-M-w windows-dmenu-global
+
+    echo_err "Init success"
+}
+
+# List all windows on all desktops, display on terminal
+# TODO: indicate on what screen virtual desktop is displayed (if any)
+all_windows_term() {
+    current_desktop=$(get_current_desktop)
+    previous_desktop=$(get_previous_desktop)
+    desktop_count=$(rpc getenv rpms_desktop_count)
+    for i in $(seq 0 $((desktop_count - 1))); do
+        # [ "$(ratpoison -c "getenv invert_$i")" = 't' ] && echo -n 'I'
+        if [ $i -eq $current_desktop ]; then
+            echo "-----*Desktop ${i}*-----"
+        elif [ $i -eq $previous_desktop ]; then
+            echo "-----+Desktop ${i}+-----"
+        else
+            echo "------Desktop ${i}------"
+        fi
+        rpc gselect $i
+        rpc windows | sed 's/^/ /'
+        echo
+    done
+    gselect_current_desktop
+}
+
+current_desktop_term() {
+    screen=${1:-$(get_selected_screen)}
+    current_desktop=$(get_current_desktop ${screen})
+    previous_desktop=$(get_previous_desktop ${screen})
+    echo "Desktop ${current_desktop}/${previous_desktop} (Screen: ${screen})"
+}
+
+current_desktop() {
+    if [ $# -gt 1 ]; then
+        rpc echo "$(current_desktop_term ${1})"
+    else
+        rpc echo "$(current_desktop_term)"
+    fi
+}
+
+# a bit sketchy, since it changes the focused screen and causes all manner of things to flicker around.
+# TODO: think of better way to do this (if neccesary use tool outside ratpoison)
+identify_screens() {
+    screen=$(get_selected_screen)
+    numscreens=$(get_numscreens)
+    for i in $(seq 0 $((numscreens - 1))); do
+        if [ ${i} -ne ${screen} ]; then
+            rpc sselect ${i}
+            current_desktop ${i}
+        fi
+    done
+    rpc sselect ${screen}
+    current_desktop ${screen}
+}
+
+# List all windows on all desktops, display in ratpoison
+all_windows() {
+    # TODO: more terse representation?
+    rpc echo "$(all_windows_term)"
+}
+
+# Some more low-level-ish commands that we expose
+gmove_here() {
+    # Move focused window to group of current desktop
+    rpc gmove $(get_current_desktop)
+}
+
+gselect_current_desktop() {
+    rpc gselect $(get_current_desktop)
+}
+
+# TODO: windows_dmenu & windows_dmenu_global
+windows_dmenu() {
+    ratpoison -c "select $(ratpoison -c 'windows' | dmenu -i -l 123 | grep -o '^[[:digit:]]*')"
+}
+
+windows_dmenu_global() {
+    desktop_count=$(rpc getenv rpms_desktop_count)
+    current_desktop=$(get_current_desktop)
+    (
+        for i in $(seq 0 $((desktop_count - 1))); do
+            ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"
+        done
+    ) | grep -v 'No managed windows' | dmenu -i -l 123 | \
+        perl -ne '/\((\d+)\)\s+(\d+)/; print "ratpoison -c gselect\\ $1 -c select\\ $2\n"' | sh
+    gselect_current_desktop
+}
+
+# usage/help
+usage() {
+    echo "Usage: <WRITE ME>"
+}
+
+cmd=$1
+shift
+case "$cmd" in
+    init)
+        init "$@"
+        ;;
+    switchscreen-hook)
+        switchscreen_hook
+        ;;
+    todesktop)
+        todesktop "$@"
+        ;;
+    desktop-other)
+        desktop_other
+        ;;
+    nextdesktop)
+        nextdesktop
+        ;;
+    prevdesktop)
+        prevdesktop
+        ;;
+    gmove-here)
+        gmove_here
+        ;;
+    gselect-current-desktop)
+        gselect_current_desktop
+        ;;
+    all-windows)
+        all_windows
+        ;;
+    all-windows-term)
+        all_windows_term
+        ;;
+    current-desktop)
+        current_desktop
+        ;;
+    current-desktop-term)
+        current_desktop_term
+        ;;
+    identify-screens)
+        identify_screens
+        ;;
+    windows-dmenu)
+        windows_dmenu
+        ;;
+    windows-dmenu-global)
+        windows_dmenu_global
+        ;;
+    *)
+        usage
+        exit 1
+esac
