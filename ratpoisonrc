@@ -115,14 +115,11 @@ definekey waitoob q gief-trayer
 # setenv xterm-trans .75
 setenv xterm_trans .85
 
-
 # bind C-exclam colon exec urxvtc -e
 alias system exec ratpoison -c "echo $(sh -c "$(ratpoison -c 'prompt system: ')")"
-#alias st exec st 
 bind C-exclam system
 bind C-M-exclam colon exec xterm -e
 bind c exec st
-
 
 alias xterm exec xterm -e 'sh -c "transset -i $WINDOWID $xterm_trans; exec bash"'
 
@@ -133,20 +130,13 @@ alias xterm-white exec xterm -rv -e 'sh -c "transset -i $WINDOWID .90; exec bash
 bind C-c xterm-and-count
 bind C-C xterm-white
 
-# # easystroke toggler
-# alias easystroke-toggle exec if pgrep -l easystroke; then killall easystroke; ratpoison -c 'echo Gestures disabled'; else ratpoison -c 'echo Gestures enabled'; exec easystroke; fi
-# definekey top XF86MyComputer easystroke-toggle
-# definekey waitoob g easystroke-toggle
-
 newkmap smallbutton
 definekey top XF86MyComputer readkey smallbutton
-definekey smallbutton XF86MyComputer easystroke-toggle
 definekey smallbutton XF86TouchpadToggle exec ratpoison -c 'meta o' -c 'meta o'
 definekey smallbutton XF86ScreenSaver meta space
 definekey smallbutton Up meta s
 definekey smallbutton Down meta v
 definekey smallbutton Right meta j
-
 
 # Rotatey stuff
 setenv rotation 0
@@ -169,7 +159,6 @@ definekey top C-M-XF86ScreenSaver rotate-counterclockwise
 definekey top C-XF86TouchpadToggle rotate-toggle-tablet-mode
 definekey top XF86ScreenSaver rotate-1
 definekey top XF86TouchpadToggle rotate-0
-
 
 # Volumey stuff. Unmute used only indirectly.
 # setenv volume_step 3
