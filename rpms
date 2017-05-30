@@ -200,7 +200,10 @@ init() {
     for i in $(seq 0 $((desktop_count - 1))); do
         rp_setenv_if_empty rpms_frames_$i undef
         rpc alias rpms_todesktop$i exec "$SCRIPT_PATH todesktop $i"
-        rpc bind "F$((i + 1))" rpms_todesktop$i
+    done
+    rpc bind "Escape" rpms_todesktop0
+    for i in $(seq 1 $((desktop_count - 1))); do
+        rpc bind "F${i}" "rpms_todesktop${i}"
     done
     rpc alias rpms_desktop-other exec "$SCRIPT_PATH desktop-other"
     rpc alias rpms_desktop-other-global exec "$SCRIPT_PATH desktop-other-global"
