@@ -309,11 +309,11 @@ newkmap gee
 definekey gee m gmove
 definekey gee s gselect
 definekey gee g groups
-definekey gee d gselect-current-desktop
-definekey gee c gselect-current-desktop
+definekey gee d rpms_gselect-current-desktop
+definekey gee c rpms_gselect-current-desktop
 definekey gee n gnext
 definekey gee p gprev
-definekey gee h gmove-here
+definekey gee h rpms_gmove-here
 bind g readkey gee
 
 ## per workspace registers
