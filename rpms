@@ -120,6 +120,10 @@ todesktop() {
     rpc echo "Desktop ${target}"
 }
 
+screen_other() {
+    rpc sselect $(rpc getenv rpms_previous_screen)
+}
+
 desktop_other() {
     # TODO: is the todesktop default decent behaviour when our current
     # screen previous desktop is visible on another screen?
@@ -205,10 +209,14 @@ init() {
     for i in $(seq 1 $((desktop_count - 1))); do
         rpc bind "F${i}" "rpms_todesktop${i}"
     done
+    rpc alias rpms_screen-other exec "$SCRIPT_PATH screen-other"
     rpc alias rpms_desktop-other exec "$SCRIPT_PATH desktop-other"
     rpc alias rpms_desktop-other-global exec "$SCRIPT_PATH desktop-other-global"
     rpc alias rpms_prevdesktop exec "$SCRIPT_PATH prevdesktop"
     rpc alias rpms_nextdesktop exec "$SCRIPT_PATH nextdesktop"
+    rpc bind C-question rpms_screen-other
+    rpc bind backslash rpms_screen-other
+    rpc bind C-backslash rpms_screen-other
     rpc bind slash rpms_desktop-other
     rpc bind C-slash rpms_desktop-other-global
     rpc bind less rpms_prevdesktop
@@ -361,6 +369,9 @@ case "$cmd" in
         ;;
     todesktop)
         todesktop "$@"
+        ;;
+    screen-other)
+        screen_other
         ;;
     desktop-other)
         desktop_other
