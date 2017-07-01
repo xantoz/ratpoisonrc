@@ -161,7 +161,7 @@ alias %volume-unmute exec amixer -c $volume_card sset Master on; ratpoison -c 'e
 alias volume-up     exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}+ | grep -o '\[.*dB\]'`"; fi
 alias volume-down   exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}- | grep -o '\[.*dB\]'`"; fi
 alias volume-mute   exec amixer -c $volume_card sset Master off; ratpoison -c 'echo Muted'
-alias mic-toggle    exec amixer -c $volume_card sset Capture toggle
+alias mic-toggle    exec ratpoison -c "echo Microphone `amixer -c $volume_card sset Capture toggle | grep -Po '\[(on|off)\]' | head -1`"
 definekey top XF86AudioMute volume-mute
 definekey top XF86AudioMicMute mic-toggle
 definekey top XF86AudioLowerVolume volume-down
