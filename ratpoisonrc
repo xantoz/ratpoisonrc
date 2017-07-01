@@ -11,13 +11,6 @@ unmanage qt-ponies
 # this unmanages the trayer-srg window
 unmanage panel
 
-#alias gief-trayer exec sleep 2; pgrep -l trayer-srg || sh -c 'GTK2_RC_FILES=~/.gtkrc-2.0.alt trayer-srg --width 50 --transparent true --alpha 255 --edge top --align left'
-#exec ratpoison -c 'gief-trayer'
-
-#unmanage conky (colgate)
-#alias gief-conky exec sleep 2; pgrep -l conky || conky
-#exec ratpoison -c 'gief-conky'
-
 # can't use from scripts etc.
 alias curwindow exec ratpoison -c "echo `ratpoison -c 'windows' | grep '*' | egrep -o '[[:digit:]]+'`"
 
@@ -168,7 +161,9 @@ alias %volume-unmute exec amixer -c $volume_card sset Master on; ratpoison -c 'e
 alias volume-up     exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}+ | grep -o '\[.*dB\]'`"; fi
 alias volume-down   exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}- | grep -o '\[.*dB\]'`"; fi
 alias volume-mute   exec amixer -c $volume_card sset Master off; ratpoison -c 'echo Muted'
+alias mic-toggle    exec amixer -c $volume_card sset Capture toggle
 definekey top XF86AudioMute volume-mute
+definekey top XF86AudioMicMute mic-toggle
 definekey top XF86AudioLowerVolume volume-down
 definekey top XF86AudioRaiseVolume volume-up
 
