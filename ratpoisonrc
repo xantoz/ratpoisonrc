@@ -114,7 +114,7 @@ bind C-exclam system
 bind C-M-exclam colon exec xterm -e
 bind c exec st
 
-alias xterm exec xterm -e 'sh -c "transset -i $WINDOWID $xterm_trans; exec bash"'
+alias xterm exec xterm -e '$SHELL -c "transset -i $WINDOWID $xterm_trans; exec $SHELL"'
 
 alias xterm-count exec ratpoison -c "echo XTerm count: $(ratpoison -c 'windows %c' | grep XTerm | wc -l)"
 alias xterm-and-count exec ratpoison -c 'xterm'; sleep .1; ratpoison -c 'xterm-count'
