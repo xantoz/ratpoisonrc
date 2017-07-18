@@ -56,12 +56,12 @@ get_selected_screen() {
 }
 
 get_current_desktop() {
-    screen=${1:-$(get_selected_screen)}
+    screen=${1:-${rpms_selected_screen}}
     rpc getenv rpms_screen_${screen}_current_desktop
 }
 
 get_previous_desktop() {
-    screen=${1:-$(get_selected_screen)}
+    screen=${1:-${rpms_selected_screen}}
     rpc getenv rpms_screen_${screen}_previous_desktop
 }
 
@@ -89,7 +89,7 @@ todesktop() {
         return 1
     fi
 
-    screen=$(get_selected_screen)
+    screen=${rpms_selected_screen}
     current_desktop=$(rpc getenv rpms_screen_${screen}_current_desktop)
 
     # Check if our target desktop already is displayed on another screen
@@ -125,7 +125,7 @@ screen_other() {
 }
 
 desktop_other() {
-    screen=$(get_selected_screen)
+    screen=${rpms_selected_screen}
     todesktop $(rpc getenv rpms_screen_${screen}_previous_desktop)
 }
 
@@ -281,7 +281,7 @@ all_windows_term() {
 }
 
 current_desktop_term() {
-    screen=${1:-$(get_selected_screen)}
+    screen=${1:-${rpms_selected_screen}}
     current_desktop=$(get_current_desktop ${screen})
     previous_desktop=$(get_previous_desktop ${screen})
     echo "Desktop ${current_desktop}/${previous_desktop} (Screen: ${screen})"
@@ -298,7 +298,7 @@ current_desktop() {
 # a bit sketchy, since it changes the focused screen and causes all manner of things to flicker around.
 # TODO: think of better way to do this (if neccesary use tool outside ratpoison)
 identify_screens() {
-    screen=$(get_selected_screen)
+    screen=${rpms_selected_screen}
     numscreens=$(get_numscreens)
     for i in $(seq 0 $((numscreens - 1))); do
         if [ ${i} -ne ${screen} ]; then
