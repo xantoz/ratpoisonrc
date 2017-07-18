@@ -232,7 +232,7 @@ init() {
     screen=$(get_selected_screen)
     rpc setenv rpms_selected_screen ${screen}
     rpc setenv rpms_previous_screen ${screen}
-    rp_setenv_if_empty setenv rpms_previous_desktop 0
+    rp_setenv_if_empty rpms_previous_desktop 0
     for i in $(seq 0 $((numscreens - 1))); do
         # TODO: Think of a way to be intelligent here in the re-init scenario
         rp_setenv_if_empty rpms_screen_${i}_current_desktop ${i}
