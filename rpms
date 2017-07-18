@@ -125,13 +125,6 @@ screen_other() {
 }
 
 desktop_other() {
-    # TODO: is the todesktop default decent behaviour when our current
-    # screen previous desktop is visible on another screen?
-    # Problem: switching to another screen with other feels intuitive,
-    # but next time calling desktop-other we will be on another
-    # screen, and thus also another previous desktop variable.
-    # (Possible fix: Have global previous desktop variable in addition
-    # (C-t C-/) or instead of this one)
     screen=$(get_selected_screen)
     todesktop $(rpc getenv rpms_screen_${screen}_previous_desktop)
 }
@@ -189,7 +182,6 @@ nextdesktop() {
 
 # TODO: command that lets us swap workspace left/right between screens
 # TODO: command that lets us move workspace to screen number
-# TODO: screen-other command ?
 
 init() {
     numscreens=$(( $(rpc sdump | (grep -so ',' || true) | wc -l) + 1 )) # number of commas in sdump + 1
@@ -237,8 +229,6 @@ init() {
         # TODO: Think of a way to be intelligent here in the re-init scenario
         rp_setenv_if_empty rpms_screen_${i}_current_desktop ${i}
         rp_setenv_if_empty rpms_screen_${i}_previous_desktop ${i}
-        # rpc setenv rpms_screen_${i}_current_desktop ${i}
-        # rpc setenv rpms_screen_${i}_previous_desktop ${i}
     done
     # These two are basic ratpoison commands, and not aliases defined
     # by rpms, but lets give them nicer keybinds
@@ -336,7 +326,6 @@ gselect_current_desktop() {
     rpc gselect $(get_current_desktop)
 }
 
-# TODO: windows_dmenu & windows_dmenu_global
 windows_dmenu() {
     ratpoison -c "select $(ratpoison -c 'windows' | dmenu -i -l 123 | grep -o '^[[:digit:]]*')"
 }
