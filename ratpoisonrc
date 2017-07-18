@@ -11,6 +11,9 @@ unmanage qt-ponies
 # this unmanages the trayer-srg window
 unmanage panel
 
+unmanage stalonetray
+exec pgrep -l stalonetray || stalonetray -t true
+
 # can't use from scripts etc.
 alias curwindow exec ratpoison -c "echo `ratpoison -c 'windows' | grep '*' | egrep -o '[[:digit:]]+'`"
 
@@ -103,7 +106,6 @@ definekey waitoob o transset-toggle
 definekey waitoob C-o transset-toggle
 definekey waitoob O transset
 definekey waitoob C-O transset
-definekey waitoob q gief-trayer
 
 # setenv xterm-trans .75
 setenv xterm_trans .85
