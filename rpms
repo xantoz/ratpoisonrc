@@ -139,7 +139,7 @@ desktop_other_global() {
 desktop_used() {
     desktop="$1"
     if desktop_out_of_range ${desktop}; then
-        return 0
+        return 1
     fi
     numscreens=$(get_numscreens)
     for i in $(seq 0 $((numscreens - 1))); do
