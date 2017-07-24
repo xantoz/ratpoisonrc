@@ -319,7 +319,7 @@ all_windows() {
 # Some more low-level-ish commands that we expose
 gmove_here() {
     # Move focused window to group of current desktop
-    rpc gmove $(get_current_desktop)
+    rpc gmove $(get_current_desktop) # TODO: or should we use currently selected group, instead?
 }
 
 gselect_current_desktop() {
