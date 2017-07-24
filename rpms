@@ -288,7 +288,7 @@ current_desktop_term() {
 }
 
 current_desktop() {
-    if [ $# -gt 1 ]; then
+    if [ $# -ge 1 ]; then
         rpc echo "$(current_desktop_term ${1})"
     else
         rpc echo "$(current_desktop_term)"
