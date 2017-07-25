@@ -1,5 +1,5 @@
-#!/bin/sh
-set -eu
+#!/bin/busybox ash
+set -euo pipefail
 
 SCRIPT_PATH="$(realpath $0)"
 
@@ -347,6 +347,8 @@ usage() {
     echo "Usage: <WRITE ME>"
 }
 
+(
+flock -x 200
 cmd=$1
 shift
 case "$cmd" in
@@ -405,3 +407,4 @@ case "$cmd" in
         usage
         exit 1
 esac
+) 200> /tmp/rpms.lock
