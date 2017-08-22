@@ -357,8 +357,8 @@ definekey waitoob z toggle-redshift
 # movie mode
 definekey waitoob m exec ratpoison -c 'toggle-borders' -c 'toggle-xcompmgr'
 
-# Give us 12 virtual desktops with rpms
-exec $HOME/.config/ratpoison/rpms init 12
+# Give us 13 (ESC, F1-F12) virtual desktops with rpms
+exec $HOME/.config/ratpoison/rpms init 13
 
 exec wmname LG3D
 
