@@ -280,6 +280,20 @@ all_windows_term() {
     gselect_current_desktop
 }
 
+_list_all_windows() {
+    desktop_count=$(rpc getenv rpms_desktop_count)
+    for i in $(seq 0 $((desktop_count - 1))); do
+        rpc gselect $i
+        rpc windows | grep -v 'No managed windows'
+    done
+    gselect_current_desktop
+}
+
+# Display count of windows managed by ratpoison, display on terminal
+window_count_term() {
+    _list_all_windows | wc -l
+}
+
 current_desktop_term() {
     screen=${1:-$(rpc getenv rpms_selected_screen)}
     current_desktop=$(get_current_desktop ${screen})
@@ -387,6 +401,9 @@ case "$cmd" in
         ;;
     all-windows-term)
         all_windows_term
+        ;;
+    window-count-term)
+        window_count_term
         ;;
     current-desktop)
         current_desktop
