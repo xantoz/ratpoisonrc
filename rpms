@@ -134,6 +134,24 @@ desktop_other_global() {
     todesktop $(rpc getenv rpms_previous_desktop)
 }
 
+swap_screen_prev() {
+    rpc prevscreen
+    desktop_other_global
+    rpc nextscreen
+    desktop_other_global
+    rpc prevscreen
+    desktop_other_global
+}
+
+swap_screen_next() {
+    rpc nextscreen
+    desktop_other_global
+    rpc prevscreen
+    desktop_other_global
+    rpc nextscreen
+    desktop_other_global
+}
+
 # Returns true if the desktop number is already active on some screen,
 # or if the desktop number is out of range
 desktop_used() {
@@ -204,6 +222,8 @@ init() {
     rpc alias rpms_screen-other exec "$SCRIPT_PATH screen-other"
     rpc alias rpms_desktop-other exec "$SCRIPT_PATH desktop-other"
     rpc alias rpms_desktop-other-global exec "$SCRIPT_PATH desktop-other-global"
+    rpc alias rpms_swap-screen-prev exec "$SCRIPT_PATH swap-screen-prev"
+    rpc alias rpms_swap-screen-next exec "$SCRIPT_PATH swap-screen-next"
     rpc alias rpms_prevdesktop exec "$SCRIPT_PATH prevdesktop"
     rpc alias rpms_nextdesktop exec "$SCRIPT_PATH nextdesktop"
     rpc bind C-question rpms_screen-other
@@ -234,6 +254,8 @@ init() {
     # by rpms, but lets give them nicer keybinds
     rpc bind bracketleft prevscreen
     rpc bind bracketright nextscreen
+    rpc bind C-bracketright rpms_swap-screen-next
+    rpc bind C-bracketleft rpms_swap-screen-prev
 
     rpc alias rpms_switchscreen-hook exec "$SCRIPT_PATH switchscreen-hook"
     rpc addhook switchscreen rpms_switchscreen-hook
@@ -383,6 +405,12 @@ case "$cmd" in
         ;;
     desktop-other-global)
         desktop_other_global
+        ;;
+    swap-screen-prev)
+        swap_screen_prev
+        ;;
+    swap-screen-next)
+        swap_screen_next
         ;;
     nextdesktop)
         nextdesktop
