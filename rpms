@@ -1,4 +1,5 @@
 #!/bin/busybox ash
+# -*- Mode: Shell-script -*-
 set -euo pipefail
 
 SCRIPT_PATH="$(realpath $0)"
