@@ -255,8 +255,8 @@ init() {
     # by rpms, but lets give them nicer keybinds
     rpc bind bracketleft prevscreen
     rpc bind bracketright nextscreen
-    rpc bind C-bracketright rpms_swap-screen-next
-    rpc bind C-bracketleft rpms_swap-screen-prev
+    rpc bind braceleft rpms_swap-screen-prev
+    rpc bind braceright rpms_swap-screen-next
 
     rpc alias rpms_switchscreen-hook exec "$SCRIPT_PATH switchscreen-hook"
     rpc addhook switchscreen rpms_switchscreen-hook
