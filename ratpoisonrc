@@ -348,7 +348,7 @@ alias toggle-borders exec if [ "$(ratpoison -c 'set border')" -ge 1 ]; then ratp
 definekey waitoob b toggle-borders
 
 alias toggle-xcompmgr exec if pgrep xcompmgr; then killall xcompmgr; else xcompmgr & fi; true
-alias toggle-compton exec if pgrep compton; then killall compton; else compton --glx-no-stencil --backend glx --opengl --paint-on-overlay --vsync opengl-swc & fi; true
+alias toggle-compton exec if pgrep compton; then killall compton; else compton --glx-no-stencil --backend glx --opengl --paint-on-overlay --vsync opengl-swc --unredir-if-possible & fi; true
 definekey waitoob x toggle-compton
 
 alias toggle-redshift exec killall -USR1 redshift
