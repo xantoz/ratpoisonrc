@@ -11,4 +11,4 @@ Clone to $HOME/.config/ratpoison::
   
 Source the config file from $HOME/.ratpoisonrc::
    
-  echo "source $HOME/.config/ratpoisonrc" > .ratpoisonrc
+  echo "source $HOME/.config/ratpoison/ratpoisonrc" > .ratpoisonrc
