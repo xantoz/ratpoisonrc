@@ -370,13 +370,12 @@ windows_dmenu() {
 windows_dmenu_global() {
     desktop_count=$(rpc getenv rpms_desktop_count)
     current_desktop=$(get_current_desktop)
-    (
-        for i in $(seq 0 $((desktop_count - 1))); do
-            ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"
-        done
-    ) | grep -v 'No managed windows' | dmenu -i -l 123 | \
-        perl -ne '/\((\d+)\)\s+(\d+)/; print "ratpoison -c gselect\\ $1 -c select\\ $2\n"' | sh
+    windowlist="$(
+        (for i in $(seq 0 $((desktop_count - 1))); do
+             ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"
+         done) | grep -v 'No managed windows')"
     gselect_current_desktop
+    echo "$windowlist" | dmenu -i -l 123 | perl -ne '/\((\d+)\)\s+(\d+)/; system "ratpoison -c gselect\\ $1 -c select\\ $2\n"'
 }
 
 # usage/help
