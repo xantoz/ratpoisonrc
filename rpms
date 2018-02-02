@@ -376,6 +376,7 @@ windows_dmenu_global() {
          done) | grep -v 'No managed windows')"
     gselect_current_desktop
     echo "$windowlist" | dmenu -i -l 123 | perl -ne '/\((\d+)\)\s+(\d+)/; system "ratpoison -c gselect\\ $1 -c select\\ $2\n"'
+    gselect_current_desktop
 }
 
 # usage/help
