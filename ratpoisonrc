@@ -303,6 +303,7 @@ bind m mouse-start
 # Keymap for group related actions. Partially inspired by stumpwm default keybinds
 newkmap gee
 definekey gee m gmove
+definekey gee M gmerge
 definekey gee s gselect
 definekey gee g groups
 definekey gee d rpms_gselect-current-desktop
