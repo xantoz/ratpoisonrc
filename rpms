@@ -369,7 +369,6 @@ windows_dmenu() {
 
 windows_dmenu_global() {
     desktop_count=$(rpc getenv rpms_desktop_count)
-    current_desktop=$(get_current_desktop)
     windowlist="$(
         (for i in $(seq 0 $((desktop_count - 1))); do
              ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"
