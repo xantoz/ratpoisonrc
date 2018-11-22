@@ -70,28 +70,40 @@ definekey top s-j focusleft
 definekey top s-k focusdown
 definekey top s-i focusup
 definekey top s-l focusright
-definekey top C-s-j exchangeleft
-definekey top C-s-k exchangedown
-definekey top C-s-i exchangeup
-definekey top C-s-l exchangeright
 definekey top s-Left focusleft
 definekey top s-Down focusdown
 definekey top s-Up focusup
 definekey top s-Right focusright
+
+definekey top C-s-j exchangeleft
+definekey top C-s-k exchangedown
+definekey top C-s-i exchangeup
+definekey top C-s-l exchangeright
 definekey top C-s-Left exchangeleft
 definekey top C-s-Down exchangedown
 definekey top C-s-Up exchangeup
 definekey top C-s-Right exchangeright
-# newkmap focus
-# definekey focus j focusleft
-# definekey focus k focusdown
-# definekey focus i focusup
-# definekey focus l focusright
-# definekey focus C-j exchangeleft
-# definekey focus C-k exchangedown
-# definekey focus C-i exchangeup
-# definekey focus C-l exchangeright
-# definekey top XF86Launch1 readkey focus
+
+# Shifted (instead of using ctrl) versions for sway/i3/awesome compatibility
+definekey top s-J exchangeleft
+definekey top s-K exchangedown
+definekey top s-I exchangeup
+definekey top s-L exchangeright
+definekey top S-s-Left exchangeleft
+definekey top S-s-Down exchangedown
+definekey top S-s-Up exchangeup
+definekey top S-s-Right exchangeright
+
+# TODO: move into rpms?
+definekey top s-bracketleft prevscreen
+definekey top s-bracketright nextscreen
+definekey top s-braceleft rpms_swap-screen-prev
+definekey top s-braceright rpms_swap-screen-next
+definekey top s-backslash rpms_screen-other
+definekey top s-slash rpms_desktop-other
+definekey top C-s-slash rpms_desktop-other-global
+definekey top s-comma rpms_prevdesktop
+definekey top s-period rpms_nextdesktop
 
 setenv filewin_w 1000
 setenv filewin_h 700
