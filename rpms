@@ -1,4 +1,4 @@
-#!/usr/bin/env -S busybox ash
+#!/bin/busybox ash
 # -*- Mode: Shell-script -*-
 set -euo pipefail
 
