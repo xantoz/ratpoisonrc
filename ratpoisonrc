@@ -167,15 +167,27 @@ definekey top C-XF86TouchpadToggle rotate-toggle-tablet-mode
 definekey top XF86ScreenSaver rotate-1
 definekey top XF86TouchpadToggle rotate-0
 
-# Volumey stuff. Unmute used only indirectly.
-# setenv volume_step 3
-setenv volume_step 2
-setenv volume_card 0
-alias %volume-unmute exec amixer -c $volume_card sset Master on; ratpoison -c 'echo Unmuted'
-alias volume-up     exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}+ | grep -o '\[.*dB\]'`"; fi
-alias volume-down   exec if amixer -c $volume_card sget Master | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer -c $volume_card sset Master ${volume_step}- | grep -o '\[.*dB\]'`"; fi
-alias volume-mute   exec amixer -c $volume_card sset Master off; ratpoison -c 'echo Muted'
-alias mic-toggle    exec ratpoison -c "echo Microphone `amixer -c $volume_card sset Capture toggle | grep -Po '\[(on|off)\]' | head -1`"
+## Volumey stuff. Unmute used only indirectly. Variables can be overridden in machine-specific ~/.ratpoisonrc.
+#
+# Examples:
+#
+#   Control the first card:
+#       setenv rp_volume_step 2
+#       setenv rp_volume_card -c 0
+#
+#   Control pulseaudio volume via amixer. (Note: specifying volume step in percent is important!):
+#       setenv rp_volume_step 2%
+#       setenv rp_volume_card -D pulse
+#
+exec [ -z "${rp_volume_step}" ]    && ratpoison -c 'setenv rp_volume_step 2' || true
+exec [ -z "${rp_volume_control}" ] && ratpoison -c 'setenv rp_volume_control Master' || true
+exec [ -z "${rp_mic_control}" ]    && ratpoison -c 'setenv rp_mic_control Capture' || true
+exec [ -z "${rp_volume_card}" ]    && ratpoison -c 'setenv rp_volume_card -D default' || true
+alias %volume-unmute exec amixer ${rp_volume_card} sset "${rp_volume_control}" on; ratpoison -c 'echo Unmuted'
+alias volume-up      exec if amixer ${rp_volume_card} sget "${rp_volume_control}" | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer ${rp_volume_card} sset "${rp_volume_control}" "${rp_volume_step}+" | grep -Eo '\[.*%\](\s*\[.*dB\])?'`"; fi
+alias volume-down    exec if amixer ${rp_volume_card} sget "${rp_volume_control}" | grep -q '\[off\]'; then ratpoison -c '%volume-unmute'; else ratpoison -c "echo `amixer ${rp_volume_card} sset "${rp_volume_control}" "${rp_volume_step}-" | grep -Eo '\[.*%\](\s*\[.*dB\])?'`"; fi
+alias volume-mute    exec amixer ${rp_volume_card} sset "${rp_volume_control}" off; ratpoison -c 'echo Muted'
+alias mic-toggle     exec ratpoison -c "echo Microphone `amixer ${rp_volume_card} sset "${rp_mic_control}" toggle | grep -Po '\[(on|off)\]' | head -1`"
 definekey top XF86AudioMute volume-mute
 definekey top XF86AudioMicMute mic-toggle
 definekey top XF86AudioLowerVolume volume-down
