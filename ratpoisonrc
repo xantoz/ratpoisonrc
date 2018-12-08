@@ -175,11 +175,11 @@ definekey top XF86TouchpadToggle rotate-0
 #       setenv rp_volume_step 2
 #       setenv rp_volume_card -c 0
 #
-#   Control pulseaudio volume via amixer. (Note: specifying volume step in percent is important!):
+#   Control pulseaudio volume via amixer. (Note: specifying volume step in percent is important here!):
 #       setenv rp_volume_step 2%
 #       setenv rp_volume_card -D pulse
 #
-exec [ -z "${rp_volume_step}" ]    && ratpoison -c 'setenv rp_volume_step 2' || true
+exec [ -z "${rp_volume_step}" ]    && ratpoison -c 'setenv rp_volume_step 2%' || true
 exec [ -z "${rp_volume_control}" ] && ratpoison -c 'setenv rp_volume_control Master' || true
 exec [ -z "${rp_mic_control}" ]    && ratpoison -c 'setenv rp_mic_control Capture' || true
 exec [ -z "${rp_volume_card}" ]    && ratpoison -c 'setenv rp_volume_card -D default' || true
