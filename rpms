@@ -41,19 +41,8 @@ error() {
 }
 
 get_selected_screen() {
-    screen_number=-1
-    OIFS=$IFS
-    IFS=","
-    for dump in $(rpc sdump); do
-        # last column indicates active screen, second column screen number
-        active="$(echo "$dump" | awk '{print $NF}')"
-        if [ $active -eq 1 ]; then
-            screen_number="$(echo "$dump" | awk '{print $2}')"
-            break
-        fi
-    done
-    IFS=$OIFS
-    echo $screen_number
+    # last column is 1 for the active screen, second column is the screen number
+    ratpoison -c 'sdump' | awk 'BEGIN { RS="," } $NF==1 { print $2 }'
 }
 
 get_current_desktop() {
