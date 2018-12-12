@@ -215,8 +215,7 @@ alias lock-screen exec if uname --kernel-version | grep -qi ubuntu; then gnome-s
 
 bind y readkey waitoob
 bind C-y readkey waitoob
-definekey waitoob t exec /usr/local/bin/yt.sh
-definekey waitoob T exec mpv `xsel -o`
+definekey waitoob t exec mpv `xsel -o`
 
 alias describe-key describekey root
 alias where-is exec ratpoison -c "echo $(ratpoison -c 'help' | grep $(ratpoison -c 'prompt Where is command: ') | xargs -i echo C-t {})" || ratpoison -c 'echo No match'
