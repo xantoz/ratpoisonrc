@@ -213,7 +213,7 @@ bind C-M-t cother
 alias xclock-toggle exec ratpoison -c 'unmanage xclock'; (pgrep -f xclock && killall xclock) || LC_ALL=ja_JP.utf8 xclock -digital -update 1 &
 bind C-x xclock-toggle
 
-alias lock-screen exec if uname --kernel-version | grep -qi ubuntu; then gnome-screensaver-command -a; else xtrlock; fi
+alias lock-screen exec physlock
 
 definekey waitoob t exec mpv "$(xsel -o)"
 definekey waitoob T exec mpv "$(xsel -bo)"
