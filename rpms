@@ -41,10 +41,30 @@ error() {
 }
 
 get_selected_screen() {
+    # last column is 1 for the active screen, second column screen number
+    ratpoison -c 'sdump' | awk 'BEGIN { RS="," } $NF==1 { print $2 }'
+}
+
+get_next_screen() {
+    if [ $(get_numscrens) -le 1 ]; then
+        echo $(get_selected_screen)
+        return 0;
+    fi
+    
     screen_number=-1
+
+    sdump_lines="$(ratpoison -c 'sdump' | tr ',' '\n')"
+    first="$(echo "${sdump_lines}" | head -1)"
+    last="$(echo "${sdump_lines}" | tail -1)"
+    
+    # first="$(echo "${sdump}" | awk -F',' '{print $1}')"
+    # last="$(echo "${sdump}" | awk -F',' '{print $NF}')"
+    split=""
+    printf ""
+    
     OIFS=$IFS
     IFS=","
-    for dump in $(rpc sdump); do
+    for dump in ${sdump}; do
         # last column indicates active screen, second column screen number
         active="$(echo "$dump" | awk '{print $NF}')"
         if [ $active -eq 1 ]; then
@@ -53,8 +73,11 @@ get_selected_screen() {
         fi
     done
     IFS=$OIFS
-    echo $screen_number
+    echo $screen_number    
 }
+
+# get_prev_screen() {
+# }
 
 get_current_desktop() {
     screen=${1:-$(get_selected_screen)}
