@@ -3,6 +3,8 @@
 # prefix map for C-t y used for much of my own custom stuff, after I ran out of other buttons to use. Was initially
 # only used for C-t y t for watching teh youtubes, thus the name.
 newkmap waitoob
+bind y readkey waitoob
+bind C-y readkey waitoob
 
 definekey waitoob k exec setxkbmap -option ctrl:nocaps
 
@@ -213,9 +215,8 @@ bind C-x xclock-toggle
 
 alias lock-screen exec if uname --kernel-version | grep -qi ubuntu; then gnome-screensaver-command -a; else xtrlock; fi
 
-bind y readkey waitoob
-bind C-y readkey waitoob
-definekey waitoob t exec mpv `xsel -o`
+definekey waitoob t exec mpv "$(xsel -o)"
+definekey waitoob T exec mpv "$(xsel -bo)"
 
 alias describe-key describekey root
 alias where-is exec ratpoison -c "echo $(ratpoison -c 'help' | grep $(ratpoison -c 'prompt Where is command: ') | xargs -i echo C-t {})" || ratpoison -c 'echo No match'
