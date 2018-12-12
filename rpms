@@ -70,6 +70,14 @@ get_numscreens() {
     rpc getenv rpms_numscreens
 }
 
+enable_switchscreen_hook() {
+    rpc addhook switchscreen rpms_switchscreen-hook
+}
+
+disable_switchscreen_hook() {
+    rpc remhook switchscreen rpms_switchscreen-hook
+}
+
 switchscreen_hook() {
     # Guarantee that we always have the right group selected for the new screen
     screen=$(get_selected_screen)
@@ -135,7 +143,37 @@ desktop_other_global() {
     todesktop $(rpc getenv rpms_previous_desktop)
 }
 
+swap_screen() {
+    swapto="$1"
+    curscr="$(get_selected_screen)"
+
+    if [ ${curscr} -eq ${swapto} ]; then
+        error "Can't swap screen with itself"
+        return 1
+    fi
+    curscr_desktop=$(ratpoison -c "getenv rpms_screen_${curscr}_current_desktop")
+    swapto_desktop=$(ratpoison -c "getenv rpms_screen_${swapto}_current_desktop")
+    curscr_fdump="$(ratpoison -c 'fdump')"
+    swapto_fdump="$(ratpoison -c "fdump ${swapto}")"
+
+    (
+        trap enable_switchscreen_hook 0
+        disable_switchscreen_hook  # call sselect without causing the hook to run
+
+        # TODO: try dynamically constructing something in sfdump format so the layout change can be applied in one step
+        ratpoison \
+            -c "sselect ${swapto}" -c 'only' -c 'select -' -c "sselect ${curscr}" \
+            -c "frestore ${swapto_fdump}" -c "sselect ${swapto}" -c "frestore ${curscr_fdump}" \
+            -c "setenv rpms_screen_${curscr}_current_desktop ${swapto_desktop}" \
+            -c "setenv rpms_screen_${swapto}_current_desktop ${curscr_desktop}" \
+            -c "setenv rpms_previous_screen ${curscr}" \
+            -c "setenv rpms_selected_screen ${swapto}"
+    )
+}
+
 swap_screen_prev() {
+    curscr=$(get_selected_screen)
+    numscreens=$(get_numscreens)
     rpc prevscreen
     desktop_other_global
     rpc nextscreen
@@ -223,6 +261,7 @@ init() {
     rpc alias rpms_screen-other exec "$SCRIPT_PATH screen-other"
     rpc alias rpms_desktop-other exec "$SCRIPT_PATH desktop-other"
     rpc alias rpms_desktop-other-global exec "$SCRIPT_PATH desktop-other-global"
+    rpc alias rpms_swap-screen exec "$SCRIPT_PATH swap-screen"
     rpc alias rpms_swap-screen-prev exec "$SCRIPT_PATH swap-screen-prev"
     rpc alias rpms_swap-screen-next exec "$SCRIPT_PATH swap-screen-next"
     rpc alias rpms_prevdesktop exec "$SCRIPT_PATH prevdesktop"
@@ -259,7 +298,7 @@ init() {
     rpc bind braceright rpms_swap-screen-next
 
     rpc alias rpms_switchscreen-hook exec "$SCRIPT_PATH switchscreen-hook"
-    rpc addhook switchscreen rpms_switchscreen-hook
+    enable_switchscreen_hook
 
     rpc alias rpms_current-desktop exec "$SCRIPT_PATH current-desktop"
     rpc alias rpms_identify-screens exec "$SCRIPT_PATH identify-screens"
@@ -405,6 +444,9 @@ case "$cmd" in
         ;;
     desktop-other-global)
         desktop_other_global
+        ;;
+    swap-screen)
+        swap_screen "$@"
         ;;
     swap-screen-prev)
         swap_screen_prev
