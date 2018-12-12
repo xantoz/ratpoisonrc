@@ -45,39 +45,25 @@ get_selected_screen() {
     ratpoison -c 'sdump' | awk 'BEGIN { RS="," } $NF==1 { print $2 }'
 }
 
-get_next_screen() {
-    if [ $(get_numscrens) -le 1 ]; then
-        echo $(get_selected_screen)
-        return 0;
-    fi
-    
-    screen_number=-1
 
-    sdump_lines="$(ratpoison -c 'sdump' | tr ',' '\n')"
-    first="$(echo "${sdump_lines}" | head -1)"
-    last="$(echo "${sdump_lines}" | tail -1)"
-    
-    # first="$(echo "${sdump}" | awk -F',' '{print $1}')"
-    # last="$(echo "${sdump}" | awk -F',' '{print $NF}')"
-    split=""
-    printf ""
-    
-    OIFS=$IFS
-    IFS=","
-    for dump in ${sdump}; do
-        # last column indicates active screen, second column screen number
-        active="$(echo "$dump" | awk '{print $NF}')"
-        if [ $active -eq 1 ]; then
-            screen_number="$(echo "$dump" | awk '{print $2}')"
-            break
-        fi
-    done
-    IFS=$OIFS
-    echo $screen_number    
+get_next_screen() {
+    if [ $(get_numscreens) -le 1 ]; then
+        get_selected_screen
+        return 0
+    fi
 }
 
-# get_prev_screen() {
-# }
+get_prev_screen() {
+    if [ $(get_numscreens) -le 1 ]; then
+        get_selected_screen
+        return 0
+    fi
+    
+    sdump_lines="$(ratpoison -c 'sdump' | tr ',' '\n')"
+    first="$(echo "${sdump_lines}" | head -1 | sed 's/1$/0/')"
+    last="$(echo "${sdump_lines}" | tail -1 | sed 's/1$/0/')"
+    printf "${last}\\n${sdump_lines}\\n${first}\\n" | awk '$NF==1 {print f} {f=$1}'
+}
 
 get_current_desktop() {
     screen=${1:-$(get_selected_screen)}
@@ -514,6 +500,12 @@ case "$cmd" in
         ;;
     windows-dmenu-global)
         windows_dmenu_global
+        ;;
+    get-next-screen)
+        get_next_screen
+        ;;
+    get-prev-screen)
+        get_prev_screen
         ;;
     *)
         usage
