@@ -239,9 +239,6 @@ nextdesktop() {
     fi
 }
 
-# TODO: command that lets us swap workspace left/right between screens
-# TODO: command that lets us move workspace to screen number
-
 init() {
     numscreens=$(( $(rpc sdump | (grep -so ',' || true) | wc -l) + 1 )) # number of commas in sdump + 1
     desktop_count=${1:-12}
