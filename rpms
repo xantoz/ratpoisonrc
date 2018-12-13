@@ -328,29 +328,34 @@ all_windows_term() {
     current_desktop=$(get_current_desktop)
     previous_desktop=$(get_previous_desktop)
     desktop_count=$(rpc getenv rpms_desktop_count)
-    for i in $(seq 0 $((desktop_count - 1))); do
-        # [ "$(ratpoison -c "getenv invert_$i")" = 't' ] && echo -n 'I'
-        if [ $i -eq $current_desktop ]; then
-            echo "-----*Desktop ${i}*-----"
-        elif [ $i -eq $previous_desktop ]; then
-            echo "-----+Desktop ${i}+-----"
-        else
-            echo "------Desktop ${i}------"
-        fi
-        rpc gselect $i
-        rpc windows | sed 's/^/ /'
-        echo
-    done
-    gselect_current_desktop
+
+    (
+        trap gselect_current_desktop 0
+        for i in $(seq 0 $((desktop_count - 1))); do
+            # [ "$(ratpoison -c "getenv invert_$i")" = 't' ] && echo -n 'I'
+            if [ $i -eq $current_desktop ]; then
+                echo "-----*Desktop ${i}*-----"
+            elif [ $i -eq $previous_desktop ]; then
+                echo "-----+Desktop ${i}+-----"
+            else
+                echo "------Desktop ${i}------"
+            fi
+            rpc gselect $i
+            rpc windows | sed 's/^/ /'
+            echo
+        done
+    )
 }
 
 _list_all_windows() {
     desktop_count=$(rpc getenv rpms_desktop_count)
-    for i in $(seq 0 $((desktop_count - 1))); do
-        rpc gselect $i
-        rpc windows | grep -v 'No managed windows'
-    done
-    gselect_current_desktop
+    (
+        trap gselect_current_desktop 0
+        for i in $(seq 0 $((desktop_count - 1))); do
+            rpc gselect $i
+            rpc windows | grep -v 'No managed windows'
+        done
+    )
 }
 
 # Display count of windows managed by ratpoison, display on terminal
