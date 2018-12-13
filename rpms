@@ -106,7 +106,7 @@ desktop_out_of_range() {
 }
 
 todesktop() {
-    target=$1
+    target="$1"
     if desktop_out_of_range ${target}; then
         error "Desktop ${target} out of range"
         return 1
@@ -165,8 +165,8 @@ swap_screen() {
         error "Can't swap screen with itself"
         return 1
     fi
-    curscr_desktop=$(ratpoison -c "getenv rpms_screen_${curscr}_current_desktop")
-    swapto_desktop=$(ratpoison -c "getenv rpms_screen_${swapto}_current_desktop")
+    curscr_desktop="$(ratpoison -c "getenv rpms_screen_${curscr}_current_desktop")"
+    swapto_desktop="$(ratpoison -c "getenv rpms_screen_${swapto}_current_desktop")"
     curscr_fdump="$(ratpoison -c 'fdump')"
     swapto_fdump="$(ratpoison -c "fdump ${swapto}")"
 
