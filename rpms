@@ -45,6 +45,31 @@ get_selected_screen() {
     ratpoison -c 'sdump' | awk 'BEGIN { RS="," } $NF==1 { print $2 }'
 }
 
+_rotational_sdump() {
+    sdump_lines="$(ratpoison -c 'sdump' | tr ',' '\n')"
+    first="$(echo "${sdump_lines}" | head -1 | sed 's/1$/0/')"
+    last="$(echo "${sdump_lines}" | tail -1 | sed 's/1$/0/')"
+    printf -- '%s\n%s\n%s\n' "${last}" "${sdump_lines}" "${first}"
+}
+
+get_next_screen() {
+    if [ $(get_numscreens) -le 1 ]; then
+        get_selected_screen
+        return 0
+    fi
+
+    _rotational_sdump | awk '$NF==1 { getline; print $2 }'
+}
+
+get_prev_screen() {
+    if [ $(get_numscreens) -le 1 ]; then
+        get_selected_screen
+        return 0
+    fi
+
+    _rotational_sdump | awk '$NF==1 { print f } { f=$2 }'
+}
+
 get_current_desktop() {
     screen=${1:-$(get_selected_screen)}
     rpc getenv rpms_screen_${screen}_current_desktop
@@ -161,23 +186,11 @@ swap_screen() {
 }
 
 swap_screen_prev() {
-    curscr=$(get_selected_screen)
-    numscreens=$(get_numscreens)
-    rpc prevscreen
-    desktop_other_global
-    rpc nextscreen
-    desktop_other_global
-    rpc prevscreen
-    desktop_other_global
+    swap_screen "$(get_prev_screen)"
 }
 
 swap_screen_next() {
-    rpc nextscreen
-    desktop_other_global
-    rpc prevscreen
-    desktop_other_global
-    rpc nextscreen
-    desktop_other_global
+    swap_screen "$(get_next_screen)"
 }
 
 # Returns true if the desktop number is already active on some screen,
