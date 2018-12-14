@@ -7,6 +7,6 @@ exec ratpoison -c "setenv rp_backlight_max $(cat ${rp_backlight_path}/max_bright
 exec ratpoison -c "setenv rp_backlight_step $((${rp_backlight_step_multiplier} * $(cat ${rp_backlight_path}/max_brightness) / 100))"
 
 alias backlight-inc exec let x="$(cat ${rp_backlight_path}/brightness) + ${rp_backlight_step}"; let x="(${x} > ${rp_backlight_max}) ? ${rp_backlight_max} : ${x}"; echo "${x}" > "${rp_backlight_path}/brightness"; ratpoison -c "echo $(cat ${rp_backlight_path}/brightness)"
-alias backlight-dec exec let x="$(cat ${rp_backlight_path}/brightness) - ${rp_backlight_step}"; let x="(${x} < 0)                ? 0                : ${x}"; echo "${x}" > "${rp_backlight_path}/brightness"; ratpoison -c "echo $(cat ${rp_backlight_path}/brightness)"
+alias backlight-dec exec let x="$(cat ${rp_backlight_path}/brightness) - ${rp_backlight_step}"; let x="(${x} < 0)                   ? 0                   : ${x}"; echo "${x}" > "${rp_backlight_path}/brightness"; ratpoison -c "echo $(cat ${rp_backlight_path}/brightness)"
 definekey top XF86MonBrightnessUp backlight-inc
 definekey top XF86MonBrightnessDown backlight-dec
