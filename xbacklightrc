@@ -1,0 +1,4 @@
+#-*- Mode: Ratpoisonrc -*-
+
+definekey top XF86MonBrightnessUp   exec xbacklight -time 0 -inc 8
+definekey top XF86MonBrightnessDown exec xbacklight -time 0 -dec 8
