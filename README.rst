@@ -44,3 +44,7 @@ Clone to $HOME/.config/ratpoison::
 Source the config file from $HOME/.ratpoisonrc::
    
   echo "source $HOME/.config/ratpoison/ratpoisonrc" > .ratpoisonrc
+
+To add some optional feature::
+
+  echo "source $HOME/.config/ratpoison/volumerc" >> .ratpoisonrc
