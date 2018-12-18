@@ -8,6 +8,14 @@ rpc() {
     ratpoison -c "$*"
 }
 
+escape() {
+    echo "$1" | sed s/\'/\'\\\\\'\'/g
+}
+
+rp() {
+    eval "$(echo ratpoison $(for i in "$@"; do printf -- " -c '%s'" "$(escape "$i")"; done))"
+}
+
 rp_setenv_if_empty() {
     if [ $# -lt 2 ]; then
         echo_err "Too few arguments"
