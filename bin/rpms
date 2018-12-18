@@ -87,12 +87,12 @@ get_prev_screen() {
 }
 
 get_current_desktop() {
-    screen=${1:-$(get_selected_screen)}
+    screen=${1:-${rpms_selected_screen}}
     rpc getenv rpms_screen_${screen}_current_desktop
 }
 
 get_previous_desktop() {
-    screen=${1:-$(get_selected_screen)}
+    screen=${1:-${rpms_selected_screen}}
     rpc getenv rpms_screen_${screen}_previous_desktop
 }
 
@@ -122,7 +122,7 @@ switchscreen_hook() {
 
 desktop_out_of_range() {
     desktop="$1"
-    ! ([ ${desktop} -ge 0 ] && [ ${desktop} -lt $(rpc getenv rpms_desktop_count) ])
+    ! ([ ${desktop} -ge 0 ] && [ ${desktop} -lt ${rpms_desktop_count} ])
 }
 
 todesktop() {
@@ -132,34 +132,34 @@ todesktop() {
         return 1
     fi
 
-    screen=$(get_selected_screen)
-    current_desktop=$(rpc getenv rpms_screen_${screen}_current_desktop)
+    screen=${rpms_selected_screen}
+    current_desktop=$(ratpoison -c "getenv rpms_screen_${screen}_current_desktop")
 
     # Check if our target desktop already is displayed on another screen
-    for i in $(get_screen_ids); do
-        if [ $(rpc getenv rpms_screen_${i}_current_desktop) -eq ${target} ]; then
+    for i in ${rpms_screen_id_list}; do
+        if [[ rpms_screen_${i}_current_desktop -eq target ]]; then
             # TODO: variant (extra parameter?) that causes the screen to swap with each other herbstluftwm style?
-            rpc echo "[SWITCH] Desktop ${target} on screen ${i}"
-            rpc sselect $i
+            ratpoison -c "echo [SWITCH] Desktop ${target} on screen ${i}" \
+                      -c "sselect $i"
             return 0
         fi
     done
 
-    rpc setenv rpms_frames_${current_desktop} "$(rpc fdump)"
-    rpc setenv rpms_screen_${screen}_previous_desktop ${current_desktop}
-    rpc setenv rpms_previous_desktop ${current_desktop}
-    rpc setenv rpms_screen_${screen}_current_desktop ${target}
     # rpc '%desktop-switch-invert-handler'
-    rpc gselect ${target}
-    frames="$(rpc getenv rpms_frames_${target})"
+    frames="$(ratpoison -c "getenv rpms_frames_${target}")"
+    ratpoison \
+        -c "setenv rpms_frames_${current_desktop} $(ratpoison -c fdump)" \
+        -c "setenv rpms_screen_${screen}_previous_desktop ${current_desktop}" \
+        -c "setenv rpms_previous_desktop ${current_desktop}" \
+        -c "setenv rpms_screen_${screen}_current_desktop ${target}" \
+        -c "gselect ${target}"
     if [ -z "${frames}" ] || [ "${frames}" = "undef" ]; then
         # No frames saved for this desktop yet, present emptyness
-        rpc only
-        rpc select -
+        ratpoison -c 'only' -c 'select -'
     else
-        rpc frestore "${frames}"
+        ratpoison -c "frestore ${frames}"
     fi
-    rpc echo "Desktop ${target}"
+    ratpoison -c "echo Desktop ${target}"
 }
 
 screen_other() {
@@ -220,7 +220,7 @@ desktop_used() {
         return 1
     fi
     for i in $(get_screen_ids); do
-        [ $(rpc getenv rpms_screen_${i}_current_desktop) -eq ${desktop} ] && return 0
+        [[ rpms_screen_${i}_current_desktop -eq desktop ]] && return 0
     done
     return 1
 }
