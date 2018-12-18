@@ -1,10 +1,20 @@
 #-*- Mode: Ratpoisonrc -*-
 
-exec [ -z "${rp_backlight_path}" ] && ratpoison -c 'setenv rp_backlight_path /sys/class/backlight/intel_backlight' || :
-exec [ -z "${rp_backlight_step_multiplier}" ] && ratpoison -c 'setenv rp_backlight_step_multiplier 6' || :
+## Backlight control via direct access in /sys
+#
+# Needs udev rules to give write perms to /sys/class/backlight/<backlight>/brightness
+#
+# Can be customized with variables rp_backlight_path and rp_backlight_step_percent
+#
+# Examples:
+#
+#   setenv rp_backlight_path /sys/class/backlight/my_backlight
+#   setenv rp_backlight_step_percent 3
+#   source /home/my-user/.config/ratpoison/backlightrc
+#
+####
 
-exec ratpoison -c "setenv rp_backlight_max $(cat ${rp_backlight_path}/max_brightness)"
-exec ratpoison -c "setenv rp_backlight_step $((${rp_backlight_step_multiplier} * $(cat ${rp_backlight_path}/max_brightness) / 100))"
+exec bp="${rp_backlight_path:-/sys/class/backlight/intel_backlight}"; mul="${rp_backlight_step_percent:-6}"; max=$(cat ${bp}/max_brightness); ratpoison -c "setenv rp_backlight_path ${bp}" -c "setenv rp_backlight_step_percent ${mul}" -c "setenv rp_backlight_max ${max}" -c "setenv rp_backlight_step $((mul * max / 100))"
 
 alias backlight-inc exec let x="$(cat ${rp_backlight_path}/brightness) + ${rp_backlight_step}"; let x="(${x} > ${rp_backlight_max}) ? ${rp_backlight_max} : ${x}"; echo "${x}" > "${rp_backlight_path}/brightness"; ratpoison -c "echo $(cat ${rp_backlight_path}/brightness)"
 alias backlight-dec exec let x="$(cat ${rp_backlight_path}/brightness) - ${rp_backlight_step}"; let x="(${x} < 0)                   ? 0                   : ${x}"; echo "${x}" > "${rp_backlight_path}/brightness"; ratpoison -c "echo $(cat ${rp_backlight_path}/brightness)"
