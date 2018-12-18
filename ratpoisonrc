@@ -1,5 +1,7 @@
 #-*- Mode: Ratpoisonrc -*-
 
+set startupmessage 0
+
 # prefix map for C-t y used for much of my own custom stuff, after I ran out of other buttons to use. Was initially
 # only used for C-t y t for watching teh youtubes, thus the name.
 newkmap waitoob
