@@ -45,6 +45,14 @@ get_selected_screen() {
     ratpoison -c 'sdump' | awk 'BEGIN { RS="," } $NF==1 { print $2 }'
 }
 
+get_screen_ids_nc() {
+    ratpoison -c 'sdump' | awk 'BEGIN { RS=","; ORS=" "; } { print $2 }'
+}
+
+get_screen_ids() {
+    ratpoison -c 'getenv rpms_screen_id_list'
+}
+
 _rotational_sdump() {
     sdump_lines="$(ratpoison -c 'sdump' | tr ',' '\n')"
     first="$(echo "${sdump_lines}" | head -1 | sed 's/1$/0/')"
@@ -78,6 +86,10 @@ get_current_desktop() {
 get_previous_desktop() {
     screen=${1:-$(get_selected_screen)}
     rpc getenv rpms_screen_${screen}_previous_desktop
+}
+
+get_numscreens_nc() {
+    echo $(( $(rpc sdump | (grep -so ',' || true) | wc -l) + 1 )) # number of commas in sdump + 1
 }
 
 get_numscreens() {
@@ -116,8 +128,7 @@ todesktop() {
     current_desktop=$(rpc getenv rpms_screen_${screen}_current_desktop)
 
     # Check if our target desktop already is displayed on another screen
-    numscreens=$(get_numscreens)
-    for i in $(seq 0 $((numscreens - 1))); do
+    for i in $(get_screen_ids); do
         if [ $(rpc getenv rpms_screen_${i}_current_desktop) -eq ${target} ]; then
             # TODO: variant (extra parameter?) that causes the screen to swap with each other herbstluftwm style?
             rpc echo "[SWITCH] Desktop ${target} on screen ${i}"
@@ -200,8 +211,7 @@ desktop_used() {
     if desktop_out_of_range ${desktop}; then
         return 1
     fi
-    numscreens=$(get_numscreens)
-    for i in $(seq 0 $((numscreens - 1))); do
+    for i in $(get_screen_ids); do
         [ $(rpc getenv rpms_screen_${i}_current_desktop) -eq ${desktop} ] && return 0
     done
     return 1
@@ -240,7 +250,8 @@ nextdesktop() {
 }
 
 init() {
-    numscreens=$(( $(rpc sdump | (grep -so ',' || true) | wc -l) + 1 )) # number of commas in sdump + 1
+    numscreens=$(get_numscreens_nc)
+    screens=$(get_screen_ids_nc)
     desktop_count=${1:-12}
     [ ${desktop_count} -gt ${numscreens} ] || \
         die "Must have more virtual desktops than there are screens"
@@ -280,12 +291,13 @@ init() {
     rpc bind C-period rpms_nextdesktop
 
     rpc setenv rpms_numscreens ${numscreens}
+    rpc setenv rpms_screen_id_list ${screens}
     screen=$(get_selected_screen)
     rpc setenv rpms_selected_screen ${screen}
     rpc setenv rpms_previous_screen ${screen}
     rp_setenv_if_empty rpms_previous_desktop 0
-    for i in $(seq 0 $((numscreens - 1))); do
-        # TODO: Think of a way to be intelligent here in the re-init scenario
+    for i in ${screens}; do
+        # TODO: Think of a way to be intelligent here in the re-init scenario. (There could theoretically be collisions of current_desktop)
         rp_setenv_if_empty rpms_screen_${i}_current_desktop ${i}
         rp_setenv_if_empty rpms_screen_${i}_previous_desktop ${i}
     done
@@ -379,8 +391,7 @@ current_desktop() {
 # TODO: think of better way to do this (if neccesary use tool outside ratpoison)
 identify_screens() {
     screen=$(get_selected_screen)
-    numscreens=$(get_numscreens)
-    for i in $(seq 0 $((numscreens - 1))); do
+    for i in $(get_screen_ids); do
         if [ ${i} -ne ${screen} ]; then
             rpc sselect ${i}
             current_desktop ${i}
