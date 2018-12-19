@@ -174,7 +174,7 @@ swap_screen() {
 
     if [ ${curscr} -eq ${swapto} ]; then
         error "Can't swap screen with itself"
-        return 1
+        return 0
     fi
     curscr_desktop="$(ratpoison -c "getenv rpms_screen_${curscr}_current_desktop")"
     swapto_desktop="$(ratpoison -c "getenv rpms_screen_${swapto}_current_desktop")"
