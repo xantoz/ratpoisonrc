@@ -3,6 +3,7 @@
 ## Backlight control via direct access in /sys
 #
 # Needs udev rules to give write perms to /sys/class/backlight/<backlight>/brightness
+# See: examples/99-backlight.udev.rules for an example on how to do this
 #
 # Can be customized with variables rp_backlight_path and rp_backlight_step_percent
 #
