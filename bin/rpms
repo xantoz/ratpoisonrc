@@ -88,12 +88,12 @@ get_prev_screen() {
 
 get_current_desktop() {
     screen=${1:-${rpms_selected_screen}}
-    rpc getenv rpms_screen_${screen}_current_desktop
+    echo $((rpms_screen_${screen}_current_desktop))
 }
 
 get_previous_desktop() {
     screen=${1:-${rpms_selected_screen}}
-    rpc getenv rpms_screen_${screen}_previous_desktop
+    echo $((rpms_screen_${screen}_previous_desktop))
 }
 
 get_numscreens_nc() {
@@ -133,7 +133,7 @@ todesktop() {
     fi
 
     screen=${rpms_selected_screen}
-    current_desktop=$(ratpoison -c "getenv rpms_screen_${screen}_current_desktop")
+    current_desktop=$((rpms_screen_${screen}_current_desktop))
 
     # Check if our target desktop already is displayed on another screen
     for i in ${rpms_screen_id_list}; do
@@ -167,13 +167,12 @@ screen_other() {
 }
 
 desktop_other() {
-    screen=$(get_selected_screen)
-    todesktop $(rpc getenv rpms_screen_${screen}_previous_desktop)
+    todesktop $((rpms_screen_${rpms_selected_screen}_previous_desktop))
 }
 
 # Same as desktop_other, but switch to the last desktop, disregarding which screen it was on
 desktop_other_global() {
-    todesktop $(rpc getenv rpms_previous_desktop)
+    todesktop ${rpms_previous_desktop}
 }
 
 swap_screen() {
@@ -245,14 +244,14 @@ get_next_desktop() {
 
 prevdesktop() {
     target=$(get_prev_desktop)
-    if [ ${target} -ge 0 ]; then
+    if [[ target -ge 0 ]]; then
         todesktop ${target}
     fi
 }
 
 nextdesktop() {
     target=$(get_next_desktop)
-    if [ ${target} -lt $(rpc getenv rpms_desktop_count) ]; then
+    if [[ target -lt rpms_desktop_count ]]; then
         todesktop ${target}
     fi
 }
