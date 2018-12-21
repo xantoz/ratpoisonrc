@@ -319,11 +319,11 @@ init() {
     rpc alias rpms_gmove-here exec "$SCRIPT_PATH gmove-here"
     rpc alias rpms_gselect-current-desktop exec "$SCRIPT_PATH gselect-current-desktop"
     rpc alias rpms_all-windows exec $SCRIPT_PATH all-windows
-    rpc bind C-w rpms_all-windows
+    rpc bind W rpms_all-windows
 
     rpc alias rpms_windows-dmenu exec "$SCRIPT_PATH windows-dmenu"
     rpc alias rpms_windows-dmenu-global exec "$SCRIPT_PATH windows-dmenu-global"
-    rpc bind W rpms_windows-dmenu
+    rpc bind C-w rpms_windows-dmenu
     rpc bind C-W rpms_windows-dmenu-global
     rpc bind M-w rpms_windows-dmenu-global
     # rpc bind C-M-w rpms_windows-dmenu-global
