@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/usr/bin/env ash
 # -*- Mode: Shell-script -*-
 set -euo pipefail
 
