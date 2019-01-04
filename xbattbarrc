@@ -1,0 +1,10 @@
+#-*- Mode: Ratpoisonrc -*-
+
+# Start xbattbar and adjust padding for it.
+# Also customize the toggle-borders alias to toggle the padding with
+# it (use case being when borders are toggled to get true fullscreen)
+
+exec pgrep xbattbar > /dev/null || xbattbar -t 2 -c right
+
+set padding 0 0 2 0
+alias toggle-borders exec if [ "$(ratpoison -c 'set border')" -ge 1 ]; then ratpoison -c 'set border 0' -c 'set padding 0 0 0 0'; else ratpoison -c 'set border 1' -c 'set padding 0 0 2 0'; fi
