@@ -21,7 +21,7 @@ exec pgrep -l stalonetray || stalonetray -t true
 # can't use from scripts etc.
 alias curwindow exec ratpoison -c "echo `ratpoison -c 'windows' | grep '*' | egrep -o '[[:digit:]]+'`"
 
-alias reload exec ratpoison -c "source $HOME/.config/ratpoison/ratpoisonrc"
+alias reload exec ratpoison -c "source $HOME/.ratpoisonrc"
 alias loadrc reload
 
 set bgcolor black
