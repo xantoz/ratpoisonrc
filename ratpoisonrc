@@ -214,15 +214,13 @@ alias pgrep-af exec ratpoison -c "echo $(pgrep -af $(ratpoison -c 'prompt pgrep 
 bind M-p pgrep-l
 bind M-P pgrep-af
 
-alias uptime exec ratpoison -c "echo $(/usr/bin/uptime)"
+alias uptime exec ratpoison -c "echo $(uptime)"
 alias ddate exec ratpoison -c "echo $(ddate)"
-# alias battery exec ratpoison -c "echo $(cat /proc/acpi/battery/BAT0/state)"
 alias battery exec ratpoison -c "echo $(emacsclient -e \(battery\))"
 alias battery-verbose exec ratpoison -c "echo $(cat /proc/acpi/battery/BAT0/state; echo; emacsclient -e \(battery\))"
 alias ifconfig exec ratpoison -c "echo $(which ifconfig > /dev/null && ifconfig || /sbin/ifconfig)"
 alias iwconfig exec ratpoison -c "echo $(iwconfig || /sbin/iwconfig || /usr/sbin/iwconfig)"
 alias sensors exec ratpoison -c "echo $(sensors)"
-# alias cpufreq-info exec ratpoison -c "echo `cpufreq-info`"
 alias cpufreq-info exec ratpoison -c "echo `cpupower frequency-info`"
 
 bind C-b battery
