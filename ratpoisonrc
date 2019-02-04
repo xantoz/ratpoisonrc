@@ -342,15 +342,8 @@ definekey waitoob s readkey register-store
 alias toggle-borders exec if [ "$(ratpoison -c 'set border')" -ge 1 ]; then ratpoison -c 'set border 0'; else ratpoison -c 'set border 1'; fi
 definekey waitoob b toggle-borders
 
-alias toggle-xcompmgr exec if pgrep xcompmgr; then killall xcompmgr; else xcompmgr & fi; true
-alias toggle-compton exec if pgrep compton; then killall compton; else compton --glx-no-stencil --backend glx --opengl --paint-on-overlay --vsync opengl-swc & fi; true
-definekey waitoob x toggle-compton
-
 alias toggle-redshift exec killall -USR1 redshift
 definekey waitoob z toggle-redshift
-
-# movie mode
-definekey waitoob m exec ratpoison -c 'toggle-borders' -c 'toggle-xcompmgr'
 
 # Give us 13 (ESC, F1-F12) virtual desktops with rpms
 exec $HOME/.config/ratpoison/bin/rpms init 13

@@ -1,0 +1,5 @@
+exec comp=${rp_compositor:-compton}; args="${rp_compositor_args:---glx-no-stencil --backend glx --opengl --paint-on-overlay --vsync opengl-swc}"; ratpoison -c "setenv rp_compositor ${comp}" -c "setenv rp_compositor_args ${args}"; if [ ${rp_compositor_pid:-0} -eq 0 ]; then ${comp} ${args} & ratpoison -c "setenv rp_compositor_pid $!"; fi
+
+alias toggle-compositor exec if ps ${rp_compositor_pid:-0} 2>&1 > /dev/null; then kill ${rp_compositor_pid}; ratpoison -c 'setenv rp_compositor_pid 0'; else ${rp_compositor} ${rp_compositor_args} & ratpoison -c "setenv rp_compositor_pid $!"; fi; true
+definekey waitoob x toggle-compositor
+
