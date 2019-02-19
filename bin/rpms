@@ -404,7 +404,9 @@ identify_screens() {
 # List all windows on all desktops, display in ratpoison
 all_windows() {
     # TODO: more terse representation?
-    rpc echo "$(all_windows_term)"
+    # Change font size temporarily so that we can see more entries
+    oldfont=$(ratpoison -c 'set font')
+    ratpoison -c 'set font unifont:size=8' -c "echo $(all_windows_term)" -c "set font ${oldfont}"
 }
 
 # Some more low-level-ish commands that we expose
