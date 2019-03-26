@@ -68,8 +68,6 @@ bind C-S hsplit 2/3
 
 # avoid stretching for the arrow keys (prefixless binds)
 # TODO: I should probably use these more...
-definekey top s-o focus
-definekey top s-O focusprev
 definekey top s-j focusleft
 definekey top s-k focusdown
 definekey top s-i focusup
@@ -101,6 +99,8 @@ definekey top S-s-Right exchangeright
 # TODO: move into rpms?
 definekey top s-bracketleft prevscreen
 definekey top s-bracketright nextscreen
+definekey top s-u prevscreen
+definekey top s-o nextscreen
 definekey top s-braceleft rpms_swap-screen-prev
 definekey top s-braceright rpms_swap-screen-next
 definekey top s-backslash rpms_screen-other
