@@ -434,7 +434,9 @@ windows_dmenu_global() {
             (for i in $(seq 0 $((desktop_count - 1))); do
                  ratpoison -c "gselect $i" -c 'windows' | sed "s/^/\\($i\\) /"
              done) | grep -v 'No managed windows')"
-        echo "$windowlist" | dmenu -i -l 123 | perl -ne '/\((\d+)\)\s+(\d+)/; system "ratpoison -c gselect\\ $1 -c select\\ $2\n"'
+        echo "$windowlist" | \
+            dmenu -i -l 123 | \
+            perl -ne '/\((\d+)\)\s+(\d+)/; system "ratpoison -c gselect\\ $1 -c select\\ $2\n"'
     )
 }
 
