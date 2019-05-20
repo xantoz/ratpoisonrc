@@ -104,7 +104,7 @@ switchscreen_hook() {
     # Guarantee that we always have the right group selected for the new screen
     screen=$(get_selected_screen)
     ratpoison \
-        -c "gselect $(ratpoison-c "getenv rpms_screen_${screen}_current_desktop")" \
+        -c "gselect $(ratpoison -c "getenv rpms_screen_${screen}_current_desktop")" \
         -c "setenv rpms_previous_screen $(ratpoison -c 'getenv rpms_selected_screen')" \
         -c "setenv rpms_selected_screen ${screen}"
 }
