@@ -153,7 +153,7 @@ todesktop() {
 }
 
 screen_other() {
-    ratpoison -c "sselect $(ratpoison -c getenv rpms_previous_screen)"
+    ratpoison -c "sselect $(ratpoison -c 'getenv rpms_previous_screen')"
 }
 
 desktop_other() {
