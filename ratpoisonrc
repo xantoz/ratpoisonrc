@@ -66,6 +66,13 @@ bind M-5 restore-fs5
 bind C-s split 2/3
 bind C-S hsplit 2/3
 
+# move commands (moves window to other frame w/o exchanging)
+# TODO: works badly when moving causes an empty frame ('other' fails)
+alias moveleft  exec ratpoison -c 'exchangeleft'  -c 'focuslast' -c 'other' -c 'focuslast'
+alias movedown  exec ratpoison -c 'exchangedown'  -c 'focuslast' -c 'other' -c 'focuslast'
+alias moveup    exec ratpoison -c 'exchangeup'    -c 'focuslast' -c 'other' -c 'focuslast'
+alias moveright exec ratpoison -c 'exchangeright' -c 'focuslast' -c 'other' -c 'focuslast'
+
 # avoid stretching for the arrow keys (prefixless binds)
 # TODO: I should probably use these more...
 definekey top s-j focusleft
@@ -86,15 +93,25 @@ definekey top C-s-Down exchangedown
 definekey top C-s-Up exchangeup
 definekey top C-s-Right exchangeright
 
-# Shifted (instead of using ctrl) versions for sway/i3/awesome compatibility
-definekey top s-J exchangeleft
-definekey top s-K exchangedown
-definekey top s-I exchangeup
-definekey top s-L exchangeright
-definekey top S-s-Left exchangeleft
-definekey top S-s-Down exchangedown
-definekey top S-s-Up exchangeup
-definekey top S-s-Right exchangeright
+# Shifted versions move but do not exchange
+definekey top s-J       moveleft
+definekey top s-K       movedown
+definekey top s-I       moveup
+definekey top s-L       moveright
+definekey top S-s-Left  moveleft
+definekey top S-s-Down  movedown
+definekey top S-s-Up    moveup
+definekey top S-s-Right moveright
+bind S-Left  moveleft
+bind S-Down  movedown
+bind S-Up    moveup
+bind S-Right moveright
+# ctrl+shift also moves it into the new group (useful when moving window to another screen)
+bind C-S-Left  exec ratpoison -c moveleft  -c rpms_gmove-here
+bind C-S-Down  exec ratpoison -c movedown  -c rpms_gmove-here
+bind C-S-Up    exec ratpoison -c moveup    -c rpms_gmove-here
+bind C-S-Right exec ratpoison -c moveright -c rpms_gmove-here
+
 
 # TODO: move into rpms?
 definekey top s-bracketleft prevscreen
