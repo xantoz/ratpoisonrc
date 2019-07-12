@@ -445,6 +445,8 @@ usage() {
     echo "Usage: <WRITE ME>"
 }
 
+[ $# -lt 1 ] && usage && die
+
 (
 flock -x 200
 cmd=$1
@@ -499,10 +501,10 @@ case "$cmd" in
         window_count_term
         ;;
     current-desktop)
-        current_desktop
+        current_desktop "$@"
         ;;
     current-desktop-term)
-        current_desktop_term
+        current_desktop_term "$@"
         ;;
     identify-screens)
         identify_screens
