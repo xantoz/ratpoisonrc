@@ -172,7 +172,7 @@ setenv rotation 0
 setenv old -old
 
 # rotate-handle-xsetwacom never called directly! (maybe use getenv, instead of tjosan, in future if buggy?)
-alias %rotate-handle-xsetwacom exec FISK=$(if [ "$rotation" -eq 0 ]; then echo -n 0; elif [ "$rotation" -eq 1 ]; then echo -n 2; elif [ "$rotation" -eq 2 ]; then echo -n 3; elif [ "$rotation" -eq 3 ]; then echo -n 1; else echo "BAJSSJSJSJSJSJSJSJ"; fi); for i in cursor stylus eraser; do xsetwacom --set $i rotate $FISK; done
+alias %rotate-handle-xsetwacom exec FISK=$(if [ "$rotation" -eq 0 ]; then echo -n 0; elif [ "$rotation" -eq 1 ]; then echo -n 2; elif [ "$rotation" -eq 2 ]; then echo -n 3; elif [ "$rotation" -eq 3 ]; then echo -n 1; else echo "BAJSSJSJSJSJSJSJSJ"; fi); for i in ${rp_wacomdevices}; do xsetwacom --set $i rotate $FISK; done
 alias %rotate-handle-xrandr exec xrandr --output LVDS1 --rotate $(if [ "$rotation" -eq 0 ]; then echo -n normal; elif [ "$rotation" -eq 1 ]; then echo -n left; elif [ "$rotation" -eq 2 ]; then echo -n inverted; elif [ "$rotation" -eq 3 ]; then echo -n right; else echo "BAJSSJSJSJSJSJSJSJ"; fi)
 alias %rotate-handle-xrandr-old exec xrandr -o $rotation
 alias rotate-counterclockwise exec newrot=$(( rotation + 1 )); [ "$newrot" -gt 3 ] && newrot=0; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
