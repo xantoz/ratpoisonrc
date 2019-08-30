@@ -167,20 +167,18 @@ definekey smallbutton Down meta v
 definekey smallbutton Right meta j
 
 # Rotatey stuff
-setenv rotation 0
-# setenv old 
-setenv old -old
-
-# rotate-handle-xsetwacom never called directly! (maybe use getenv, instead of tjosan, in future if buggy?)
-alias %rotate-handle-xsetwacom exec FISK=$(if [ "$rotation" -eq 0 ]; then echo -n 0; elif [ "$rotation" -eq 1 ]; then echo -n 2; elif [ "$rotation" -eq 2 ]; then echo -n 3; elif [ "$rotation" -eq 3 ]; then echo -n 1; else echo "BAJSSJSJSJSJSJSJSJ"; fi); for i in ${rp_wacomdevices}; do xsetwacom --set $i rotate $FISK; done
-alias %rotate-handle-xrandr exec xrandr --output LVDS1 --rotate $(if [ "$rotation" -eq 0 ]; then echo -n normal; elif [ "$rotation" -eq 1 ]; then echo -n left; elif [ "$rotation" -eq 2 ]; then echo -n inverted; elif [ "$rotation" -eq 3 ]; then echo -n right; else echo "BAJSSJSJSJSJSJSJSJ"; fi)
-alias %rotate-handle-xrandr-old exec xrandr -o $rotation
-alias rotate-counterclockwise exec newrot=$(( rotation + 1 )); [ "$newrot" -gt 3 ] && newrot=0; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
-alias rotate-clockwise        exec newrot=$(( rotation - 1 )); [ "$newrot" -lt 0 ] && newrot=3; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
-alias rotate-toggle-tablet-mode exec [ "$rotation" -eq 3 ] && newrot=0 || newrot=3; ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
-alias rotate-0 exec newrot=$(( rotation ^ 1 )); ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
-alias rotate-1 exec newrot=$(( rotation ^ 2 )); ratpoison -c "setenv rotation $newrot" -c '%rotate-handle-xsetwacom' -c "%rotate-handle-xrandr$old"
-alias rotate-2 exec ratpoison -c rotate-0 -c rotate-1
+setenv rp_rotation 0
+# rotate-handle-xsetwacom never called directly! (consider using getenv to get value, instead of shell interpolation, in the future if buggy?)
+setenv rp_map_rotation_to_xsetwacom 0 2 3 1
+setenv rp_map_rotation_to_xrandr normal left inverted right
+alias %rotate-handle-xsetwacom   exec ARG=$( echo "${rp_map_rotation_to_xsetwacom}" | cut -d' ' -f$(( rp_rotation%4 + 1 )) ); for i in ${rp_wacomdevices}; do xsetwacom --set $i rotate $ARG; done
+alias %rotate-handle-xrandr      exec ARG=$( echo "${rp_map_rotation_to_xrandr}"    | cut -d' ' -f$(( rp_rotation%4 + 1 )) ); xrandr --output ${rp_rotate_screen:-LVDS1} --rotate $ARG
+alias rotate-counterclockwise    exec newrot=$(( rp_rotation + 1 )); [ "$newrot" -gt 3 ] && newrot=0; ratpoison -c "setenv rp_rotation $newrot" -c '%rotate-handle-xsetwacom' -c '%rotate-handle-xrandr'
+alias rotate-clockwise           exec newrot=$(( rp_rotation - 1 )); [ "$newrot" -lt 0 ] && newrot=3; ratpoison -c "setenv rp_rotation $newrot" -c '%rotate-handle-xsetwacom' -c '%rotate-handle-xrandr'
+alias rotate-toggle-tablet-mode  exec [ "$rp_rotation" -eq 3 ] && newrot=0 || newrot=3;               ratpoison -c "setenv rp_rotation $newrot" -c '%rotate-handle-xsetwacom' -c '%rotate-handle-xrandr'
+alias rotate-0                   exec newrot=$(( rp_rotation ^ 1 ));                                  ratpoison -c "setenv rp_rotation $newrot" -c '%rotate-handle-xsetwacom' -c '%rotate-handle-xrandr'
+alias rotate-1                   exec newrot=$(( rp_rotation ^ 2 ));                                  ratpoison -c "setenv rp_rotation $newrot" -c '%rotate-handle-xsetwacom' -c '%rotate-handle-xrandr'
+alias rotate-2                   exec ratpoison -c rotate-0 -c rotate-1
 
 definekey top C-XF86ScreenSaver rotate-clockwise
 definekey top C-M-XF86ScreenSaver rotate-counterclockwise
