@@ -1,0 +1,16 @@
+#-*- Mode: Ratpoisonrc -*-
+
+# TODO: This is just a quick hack. Please rewrite me by putting most of my parts into rpms or so. (or maybe this can be its own script? be wary of racing, though)
+
+# wait for the creation of workspace groups so we are definitively the last
+# group, by first making a dummy call into rpms (utilize the locking), then
+# sleeping for 2 seconds to be extra safe
+exec $HOME/.config/ratpoison/bin/rpms dummy; sleep 2; ratpoison -c 'gnewbg cellwriter'; for i in $(seq 0 $rpms_desktop_count); do ratpoison -c "setenv rp_cw_on_$i f"; done
+
+setenv rp_cw_splitticity 110
+alias cellwriter-toggle exec blargh=$(ratpoison -c 'windows' | grep '*' | egrep -o '[[:digit:]]+'); if [ "$(ratpoison -c "getenv rp_cw_on_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")")" = 't' ]; then ratpoison -c 'gselect cellwriter' -c 'select CellWriter' -c 'remove' -c "gselect $(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")" -c "setenv rp_cw_on_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop") f"; else ratpoison -c "split $(ratpoison -c 'getenv rp_cw_splitticity')" -c 'exchangedown' -c 'focusup'; ratpoison -c 'gselect cellwriter'; pgrep cellwriter || cellwriter --show-window; ratpoison -c 'next'; ratpoison -c "gselect $(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")" -c "setenv rp_cw_on_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop") t"; fi; ratpoison -c "select $blargh"
+alias cellwriter-toggle-split-regular-size exec ratpoison -c 'setenv rp_cw_splitticity 110' -c 'cellwriter-toggle'
+alias cellwriter-toggle-split-keyboard-size exec ratpoison -c 'setenv rp_cw_splitticity 300' -c 'cellwriter-toggle'
+
+# alias set-padding-everywhere exec blargh=$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop"); for i in $(seq 0 $rpms_desktop_count); do ratpoison -c "todesktop$i" -c 'set padding 0 0 0 0' -c 'set padding 0 110 0 20'; done; ratpoison -c "rpms_todesktop $blargh"
+# alias unset-padding-everywhere exec blargh=$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop"); for i in $(seq 0 $rpms_desktop_count); do sleep 0.2; ratpoison -c "todesktop$i" -c 'set padding 1 1 1 1' -c 'set padding 0 0 0 0'; done; ratpoison -c "rpms_todesktop $blargh"
