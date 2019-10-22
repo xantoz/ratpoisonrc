@@ -112,7 +112,6 @@ bind C-S-Down  exec ratpoison -c movedown  -c rpms_gmove-here
 bind C-S-Up    exec ratpoison -c moveup    -c rpms_gmove-here
 bind C-S-Right exec ratpoison -c moveright -c rpms_gmove-here
 
-
 # TODO: move into rpms?
 definekey top s-bracketleft prevscreen
 definekey top s-bracketright nextscreen
@@ -125,6 +124,9 @@ definekey top s-slash rpms_desktop-other
 definekey top C-s-slash rpms_desktop-other-global
 definekey top s-comma rpms_prevdesktop
 definekey top s-period rpms_nextdesktop
+
+# prefixless terminal spawner
+definekey top s-Return xterm
 
 setenv filewin_w 1000
 setenv filewin_h 700
