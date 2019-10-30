@@ -125,8 +125,9 @@ definekey top C-s-slash rpms_desktop-other-global
 definekey top s-comma rpms_prevdesktop
 definekey top s-period rpms_nextdesktop
 
-# prefixless terminal spawner
-definekey top s-Return xterm
+# prefixless terminal spawners
+definekey top s-Return exec ratpoison -c hsplit -c focus -c xterm
+definekey top s-S-Return exec ratpoison -c split -c focus -c xterm
 
 setenv filewin_w 1000
 setenv filewin_h 700
