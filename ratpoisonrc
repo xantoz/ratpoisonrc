@@ -129,6 +129,9 @@ definekey top s-period rpms_nextdesktop
 definekey top s-Return exec ratpoison -c hsplit -c focus -c xterm
 definekey top s-S-Return exec ratpoison -c split -c focus -c xterm
 
+# prefixless window delete
+definekey top s-C delete
+
 setenv filewin_w 1000
 setenv filewin_h 700
 alias fix-gtk-filechooser exec sed -i -e 's/GeometryWidth=.*$/GeometryWidth='"${filewin_w}/" -e 's/GeometryHeight=.*$/GeometryHeight='"${filewin_h}/" ~/.config/gtk-2.0/gtkfilechooser.ini; gsettings set org.gtk.Settings.FileChooser window-size "(${filewin_w}, ${filewin_h})"
