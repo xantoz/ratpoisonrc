@@ -26,4 +26,10 @@ definekey top XF86AudioMute volume-mute
 definekey top XF86AudioMicMute volume-mic-toggle
 definekey top XF86AudioLowerVolume volume-down
 definekey top XF86AudioRaiseVolume volume-up
+
+# For non-media-keyboards (but that have a keypad)
+definekey top s-KP_Enter volume-mute
+definekey top s-KP_Multiply volume-mic-toggle
+definekey top s-KP_Subtract volume-down
+definekey top s-KP_Add volume-up
 bind v volume-show
