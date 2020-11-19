@@ -330,10 +330,10 @@ definekey gee h rpms_gmove-here
 bind g readkey gee
 
 ## per workspace registers
-alias r1-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r1 `ratpoison -c fdump`"
-alias r2-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r2 `ratpoison -c fdump`"
-alias r3-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r3 `ratpoison -c fdump`"
-alias r4-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop)_r4 `ratpoison -c fdump`"
+alias r1-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r1 $(ratpoison -c fdump)"
+alias r2-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r2 $(ratpoison -c fdump)"
+alias r3-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r3 $(ratpoison -c fdump)"
+alias r4-store exec ratpoison -c "setenv desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r4 $(ratpoison -c fdump)"
 alias r1-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r1)"
 alias r2-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r2)"
 alias r3-fetch exec ratpoison -c "frestore $(ratpoison -c getenv\ desktop_$(ratpoison -c "getenv rpms_screen_${rpms_selected_screen}_current_desktop")_r3)"
@@ -372,4 +372,3 @@ exec $HOME/.config/ratpoison/bin/rpms init 13
 exec wmname LG3D
 
 echo ratpoisonrc loaded successfully
-
