@@ -366,8 +366,15 @@ definekey waitoob b toggle-borders
 alias toggle-redshift exec killall -USR1 redshift
 definekey waitoob z toggle-redshift
 
+exec wpc="${rp_wallpapercmd:-feh --bg-fill}"; ratpoison -c "setenv rp_wallpapercmd ${wpc}"
+alias load-wallpaper exec if [ -n "${rp_wallpaper}" ]; then ${rp_wallpapercmd} "${rp_wallpaper}"; fi
+load-wallpaper
+
 # Give us 13 (ESC, F1-F12) virtual desktops with rpms
-exec $HOME/.config/ratpoison/bin/rpms init 13
+alias rpms-init exec $HOME/.config/ratpoison/bin/rpms init 13
+rpms-init
+
+alias randr-update exec ratpoison -c 'load-wallpaper' -c 'rpms-init'
 
 exec wmname LG3D
 
