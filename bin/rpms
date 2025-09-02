@@ -408,7 +408,11 @@ all_windows() {
     # TODO: more terse representation?
     # Change font size temporarily so that we can see more entries
     oldfont=$(ratpoison -c 'set font')
-    ratpoison -c 'set font unifont:size=8' -c "echo $(all_windows_term)" -c "set font ${oldfont}"
+    case "$(hostname)" in
+        michiru) newfont='unifont'        ;; # special case for michiru with 1080p or higher screens
+        *)       newfont='unifont:size=8' ;;
+    esac
+    ratpoison -c "set font ${newfont}" -c "echo $(all_windows_term)" -c "set font ${oldfont}"
 }
 
 # Some more low-level-ish commands that we expose
